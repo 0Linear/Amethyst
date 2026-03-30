@@ -1,7 +1,7 @@
 #define STDGLMODEL_INSTANCE_MAX_COUNT 4096
 #define STDGLMODEL_LOD_MAX_COUNT 1
 #define STDGLMODEL_MESH_MAX_COUNT 8
-#define STDGLMODEL_INSTANCE_PREPROCESS_GROUP_SIZE 128
+#define STDGLMODEL_INSTANCE_PREPROCESS_GROUP_SIZE 256
 
 struct IndirectDrawBuffer {
     uint count;
@@ -18,5 +18,5 @@ layout (std430, binding = 0) buffer ModelInfo {
 };
 
 layout (std430, binding = 1) buffer InstanceBuffer {
-    mat4 InstanceMatrices[STDGLMODEL_INSTANCE_MAX_COUNT];
+    mat4 InstanceMatrices[];
 };

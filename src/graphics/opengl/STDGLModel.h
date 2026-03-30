@@ -3,7 +3,7 @@
 #define STDGLMODEL_INSTANCE_MAX_COUNT 4096
 #define STDGLMODEL_LOD_MAX_COUNT 1
 #define STDGLMODEL_MESH_MAX_COUNT 8
-#define STDGLMODEL_INSTANCE_PREPROCESS_GROUP_SIZE 128
+#define STDGLMODEL_INSTANCE_PREPROCESS_GROUP_SIZE 256
 
 #include <glad/glad.h>
 #include "STDGLCamera.h"
@@ -63,7 +63,6 @@ public:
     GLuint InstanceBuffer = 0;
     std::queue<uint16_t> FreedIndeces;
     uint16_t NextIndex = 0;
-    bool isBufferModified[2] = { false, false };
     std::shared_ptr<STDGLModel> Model;
     std::weak_ptr<STDGLModelInstanceArray> selfRef;
     InstanceArrayBuffer* InstanceBufferMapped;
@@ -82,12 +81,10 @@ public:
 
     inline void Flush() {
         bool isFrameOdd = *FrameCounterPtr & 1;
-        if (isBufferModified[isFrameOdd]) {
             glFlushMappedNamedBufferRange(InstanceBuffer, 
-                        sizeof(InstanceArrayBuffer) * isFrameOdd,
-                        NextIndex * sizeof(mat4));
-            isBufferModified[isFrameOdd] = false;
-        }
+                    sizeof(InstanceArrayBuffer) * isFrameOdd,
+                    NextIndex * sizeof(mat4));
+        
     }
 
     friend class GLModelInstance;

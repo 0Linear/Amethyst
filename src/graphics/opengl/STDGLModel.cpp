@@ -81,14 +81,11 @@ STDGLModel::~STDGLModel() {
 void STDGLModelInstance::SetMatrix(mat4 Matrix) {
     bool isFrameOdd = *(parent->FrameCounterPtr) & 1;
     parent->InstanceBufferMapped[isFrameOdd].InstanceMatrices[index] = Matrix;
-    parent->isBufferModified[isFrameOdd] = true;
 }
 
 STDGLModelInstance::~STDGLModelInstance() {
     parent->InstanceBufferMapped[0].InstanceMatrices[index][0, 0] = NAN;
     parent->InstanceBufferMapped[1].InstanceMatrices[index][0, 0] = NAN;
-    parent->isBufferModified[0] = true;
-    parent->isBufferModified[1] = true;
     parent->FreedIndeces.push(index);
 }
 
