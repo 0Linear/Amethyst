@@ -49,47 +49,47 @@ protected:
 
     vec2 Resolution;
 
-    struct Frustum
+    struct frustum
     {
-        struct Plane{
+        struct plane{
             // unit vector + distance from origin to the nearest point in the plane
             vec4 Data = vec4(0.0f, 1.0f, 0.0f, 0.0f); 
             
-            Plane() = default;
+            plane() = default;
 
-	        Plane(const vec3& p1, const vec3& norm)
-	        	: Data(norm.norm(), norm.norm().dot(p1)) {}
+	        plane(const vec3& p1, const vec3& norm)
+	        	: Data(norm.norm(), -norm.norm().dot(p1)) {}
 
         };
     
-        Plane TopFace;
-        Plane BottomFace;
+        plane TopFace;
+        plane BottomFace;
 
-        Plane RightFace;
-        Plane LeftFace;
+        plane RightFace;
+        plane LeftFace;
 
-        Plane FarFace;
-        Plane NearFace;
+        plane FarFace;
+        plane NearFace;
     };
 
-    Frustum CreateFrustum() {
-        Frustum     frustum;
-        float halfVSide = CAMERA_DEFAULT_FAR * tanf(FOV * .5f);
+    frustum CreateFrustum() {
+        frustum     Frustum;
+        float halfVSide = CAMERA_DEFAULT_FAR * tanf(FOV * 0.5f);
         float halfHSide = halfVSide * Resolution.x / Resolution.y;
         vec3 frontMultFar = Front * CAMERA_DEFAULT_FAR;
 
-        frustum.NearFace = { Position + Front * CAMERA_DEFAULT_NEAR, Front };
-        frustum.FarFace = { Position + frontMultFar, Front * -1 };
-        frustum.RightFace = { Position,
+        Frustum.NearFace = { Position + Front * CAMERA_DEFAULT_NEAR, Front };
+        Frustum.FarFace = { Position + frontMultFar, Front * -1 };
+        Frustum.RightFace = { Position,
                                 (frontMultFar - Right * halfHSide).cross(Up) };
-        frustum.LeftFace = { Position,
+        Frustum.LeftFace = { Position,
                                 Up.cross(frontMultFar + Right * halfHSide) };
-        frustum.TopFace = { Position,
+        Frustum.BottomFace = { Position,
                                 Right.cross(frontMultFar - Up * halfVSide) };
-        frustum.BottomFace = { Position,
+        Frustum.BottomFace = { Position,
                                 (frontMultFar + Up * halfVSide).cross(Right) };
 
-        return frustum;
+        return Frustum;
     }
     
 };

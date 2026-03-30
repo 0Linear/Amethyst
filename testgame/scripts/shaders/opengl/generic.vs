@@ -4,7 +4,9 @@ layout (location = 0) in vec3 aPos;
 
 
 layout (std140, binding = 0) uniform Camera {
-    mat4 CameraMatrix;
+    mat4 CameraView;
+    mat4 CameraViewProjection;
+    vec4 CameraFrustum[6];
 };
 
 #define STDGLMODEL_INSTANCE_MAX_COUNT 4096
@@ -30,5 +32,5 @@ layout (std430, binding = 1) buffer InstanceBuffer {
 };
 
 void main() {
-    gl_Position = CameraMatrix * InstanceMatrices[InstanceIndeces[gl_BaseInstance][gl_InstanceID]] * vec4(aPos, 1.0f);
+    gl_Position = CameraViewProjection * InstanceMatrices[InstanceIndeces[gl_BaseInstance][gl_InstanceID]] * vec4(aPos, 1.0f);
 }

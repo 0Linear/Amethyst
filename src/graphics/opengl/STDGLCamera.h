@@ -23,7 +23,9 @@ public:
     const uint64_t* FrameCounterPtr;
 
     struct Camerainfo_t {
+        mat4 View;
         mat4 ViewProjection;
+        frustum Frustum;
     };
     Camerainfo_t Info;
 

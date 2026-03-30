@@ -8,8 +8,7 @@ void STDGLCamera::UpdateCameraVectors() {
     front.x = cos(glm::radians(Yaw)) * cos(glm::radians(Pitch));
     front.z = sin(glm::radians(Pitch));
     front.y = sin(glm::radians(Yaw)) * cos(glm::radians(Pitch));
-    front.norm();
-    Front = front;
+    Front = front.norm();
     // also re-calculate the Right and Up vector
     // normalize the vectors, because their length gets closer to 0 the more you look up or down which results in slower movement.
     Right = Front.cross(WorldUp).norm();
@@ -17,9 +16,10 @@ void STDGLCamera::UpdateCameraVectors() {
 }
 
 void STDGLCamera::Bind() {
-    mat4 view = glm::lookAt(Position.toglm(), (Position + Front).toglm(), Up.toglm());
+    Info.View = glm::lookAt(Position.toglm(), (Position + Front).toglm(), Up.toglm());
     mat4 projection = glm::perspective(glm::radians(FOV), Resolution.x / Resolution.y, CAMERA_DEFAULT_NEAR, CAMERA_DEFAULT_FAR);
-    Info.ViewProjection = projection * view;
+    Info.ViewProjection = projection * Info.View;
+    Info.Frustum = CreateFrustum();
     glNamedBufferSubData(Infobuffer, 0, sizeof(Camerainfo_t), &Info);
     glBindBufferBase(GL_UNIFORM_BUFFER, 0, Infobuffer);
     glNamedFramebufferTexture(Framebuffer, GL_COLOR_ATTACHMENT0, Colorbuffers[*FrameCounterPtr & 1], 0);
