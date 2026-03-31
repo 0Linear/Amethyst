@@ -37,8 +37,6 @@ std::shared_ptr<Renderer> STDGLRenderer::Make() {
 
     tempRendererRef->ShaderSystem.Init();
 
-    tempRendererRef->ModelIndirectReplicationShader = 
-                    tempRendererRef->ShaderSystem.GetComputeShader("STGLModel_IndirectBufferReplicator");
     tempRendererRef->ModelInstancePreprocessShader = 
                     tempRendererRef->ShaderSystem.GetComputeShader("STDGLModel_InstancePreprocess");
     return tempRendererRef;
@@ -94,7 +92,7 @@ void STDGLRenderer::Draw() {
             glViewport(0, 0, camera->GetResolution().x, camera->GetResolution().y);
             glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
             
-
+            
             for (auto& iarray : SharedInstanceArraysVec) {
                 iarray->Bind();
                 iarray->Model->BindInfo();
@@ -103,14 +101,6 @@ void STDGLRenderer::Draw() {
             }
 
             glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
-
-            for (auto& iarray : SharedInstanceArraysVec) {
-                iarray->Model->BindInfo();
-                glUseProgram(ModelIndirectReplicationShader);
-                glDispatchCompute(1, 1, 1);
-            }
-
-            glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT | GL_COMMAND_BARRIER_BIT);
 
             for (auto& iarray : SharedInstanceArraysVec) {
                 iarray->Bind();

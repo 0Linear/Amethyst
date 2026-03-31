@@ -38,8 +38,9 @@ public:
     };
     struct ModelInfo_t {
         DrawElementsIndirectCommand IndirectBuffers[STDGLMODEL_LOD_MAX_COUNT][STDGLMODEL_MESH_MAX_COUNT]; 
-        GLuint InstanceIndeces[STDGLMODEL_LOD_MAX_COUNT][STDGLMODEL_INSTANCE_MAX_COUNT];
         float Radius = 0.0f;
+        GLuint Lock = true;
+        GLuint InstanceIndeces[STDGLMODEL_LOD_MAX_COUNT][STDGLMODEL_INSTANCE_MAX_COUNT];
     };
 
     STDGLModel(std::string path);

@@ -14,8 +14,5 @@ Shaders {
         STDGLModel_InstancePreprocess {
             Source "STDGLModel_InstancePreprocess.cs"
         }
-        STGLModel_IndirectBufferReplicator {
-            Source "STGLModel_IndirectBufferReplicator.cs"
-        }
     }
 }
