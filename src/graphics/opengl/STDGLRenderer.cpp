@@ -87,7 +87,7 @@ void STDGLRenderer::Draw() {
 
         for (std::shared_ptr<STDGLCamera>& camera : SharedCameraVec) {
 
-            glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, camera->Name.c_str());
+            GL_PUSH_DEBUG(camera->Name.c_str());
             camera->Bind();
             glViewport(0, 0, camera->GetResolution().x, camera->GetResolution().y);
             glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
@@ -113,7 +113,7 @@ void STDGLRenderer::Draw() {
 
             glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 
-            glPopDebugGroup();
+            GL_POP_DEBUG;
             
         }
         

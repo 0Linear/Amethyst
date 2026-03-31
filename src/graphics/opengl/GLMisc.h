@@ -3,6 +3,14 @@
 #include <GLFW/glfw3.h>
 #include <backends/imgui_impl_glfw.h>
 
+#ifdef DEBUG
+    #define GL_PUSH_DEBUG(str) glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, str)
+    #define GL_POP_DEBUG glPopDebugGroup()
+#else
+    #define GL_PUSH_DEBUG(str)
+    #define GL_POP_DEBUG
+#endif
+
 class GLMisc {
 public:
     static void EnsureGLLoaded();

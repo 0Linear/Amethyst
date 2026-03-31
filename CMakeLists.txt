@@ -63,9 +63,13 @@ target_link_libraries(amethyst assimp)
 
 target_compile_definitions(amethyst PUBLIC AMETHYSTENGINESRC)
 
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+	target_compile_options(amethyst PUBLIC "-DDEBUG")
+endif()
+
 if(UNIX)
-target_link_options(amethyst PUBLIC "-rdynamic" "-Wl,-rpath,./")
-target_compile_options(amethyst PUBLIC "-fvisibility=hidden")
+	target_link_options(amethyst PUBLIC "-rdynamic" "-Wl,-rpath,./")
+	target_compile_options(amethyst PUBLIC "-fvisibility=hidden")
 endif()
 
 if(WIN32)
