@@ -14,5 +14,11 @@ Shaders {
         STDGLModel_InstancePreprocess {
             Source "STDGLModel_InstancePreprocess.cs"
         }
+        STDGLModel_InstanceReplicator {
+            Source "STDGLModel_InstanceReplicator.cs"
+        }
+        STDGLModel_InstanceBlanker {
+            Source "STDGLModel_InstanceBlanker.cs"
+        }
     }
 }

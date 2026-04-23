@@ -27,7 +27,9 @@ protected:
 
     GLsync DoubleBufferFences[2] = { nullptr, nullptr };
 
+    GLuint ModelInstanceBlankerShader;
     GLuint ModelInstancePreprocessShader;
+    GLuint ModelInstanceReplicatorShader;
 
     uint64_t FrameCounter = 0;
 

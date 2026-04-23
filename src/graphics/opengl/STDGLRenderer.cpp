@@ -44,6 +44,8 @@ void STDGLRenderer::Init() {
     ShaderSystem.Init();
 
     ModelInstancePreprocessShader = ShaderSystem.GetComputeShader("STDGLModel_InstancePreprocess");
+    ModelInstanceBlankerShader = ShaderSystem.GetComputeShader("STDGLModel_InstanceBlanker");
+    ModelInstanceReplicatorShader = ShaderSystem.GetComputeShader("STDGLModel_InstanceReplicator");
 }
 
 STDGLRenderer::~STDGLRenderer() {
@@ -96,12 +98,29 @@ void STDGLRenderer::Draw() {
             glViewport(0, 0, camera->GetResolution().x, camera->GetResolution().y);
             glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
             
-            
+            for (auto& iarray : SharedInstanceArraysVec) {
+                iarray->Bind();
+                iarray->Model->BindInfo();
+                glUseProgram(ModelInstanceBlankerShader);
+                glDispatchCompute(1, 1, 1);
+            }
+
+            glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
+
             for (auto& iarray : SharedInstanceArraysVec) {
                 iarray->Bind();
                 iarray->Model->BindInfo();
                 glUseProgram(ModelInstancePreprocessShader);
                 glDispatchCompute(STDGLMODEL_INSTANCE_MAX_COUNT / STDGLMODEL_INSTANCE_PREPROCESS_GROUP_SIZE, 1, 1);
+            }
+
+            glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
+
+            for (auto& iarray : SharedInstanceArraysVec) {
+                iarray->Bind();
+                iarray->Model->BindInfo();
+                glUseProgram(ModelInstanceReplicatorShader);
+                glDispatchCompute(1, 1, 1);
             }
 
             glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT | GL_COMMAND_BARRIER_BIT);

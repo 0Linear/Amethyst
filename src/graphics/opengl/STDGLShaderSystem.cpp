@@ -7,7 +7,10 @@ void STDGLShaderSystem::InitCompute(VdfParser::KeyValue Shaderdefs) {
     auto ShaderDefList = Shaderdefs.getChildren().value();
     for (const auto& shader : ShaderDefList) {
         auto Shaderpath = shader.second.getChild("Source");
-        if (!Shaderpath.has_value()) continue;
+        if (!Shaderpath.has_value()) {
+            std::cout << "Shader " + shader.first + " does not have a \"Source\", ignoring!" << std::endl;
+            continue;
+        }
         std::string ShaderSrc = Shadinclude::load("scripts/shaders/opengl/" + std::get<std::string>(Shaderpath->value)); 
         
         GLuint computeShader = glCreateShader(GL_COMPUTE_SHADER);
