@@ -34,7 +34,7 @@ public:
     virtual const uint64_t& GetFrameCounter() = 0;
     //! Draws everything.
     virtual void Draw() = 0;
-
+    //! Makes a renderer with the passed in classname.(E.g. "STDGLRenderer")
     static std::shared_ptr<Renderer> Make(std::string classname);
 
 #ifdef AMETHYSTENGINESRC
