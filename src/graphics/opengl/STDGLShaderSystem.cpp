@@ -27,6 +27,8 @@ void STDGLShaderSystem::InitCompute(VdfParser::KeyValue Shaderdefs) {
             glGetShaderInfoLog(computeShader, 512, NULL, infoLog);
             std::cout << infoLog << std::endl;
             Engine::Warning("Compute shader compilation error! Log printed to std::cout");
+            glDeleteShader(computeShader);
+            continue;
         }
 
         GLuint computeProgram = glCreateProgram();
@@ -38,6 +40,7 @@ void STDGLShaderSystem::InitCompute(VdfParser::KeyValue Shaderdefs) {
             glGetProgramInfoLog(computeProgram, 512, NULL, infoLog);
             std::cout << infoLog << std::endl;
             Engine::Warning("Compute shader program linking error! Log printed to std::cout");
+            glDeleteProgram(computeProgram);
         }
 
         ComputeShaders.emplace(shader.first, computeProgram);

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "engine/master.h"
 #include <fstream>
 #include <sstream>
 #include "vdfparser/vdfparser.hpp"
