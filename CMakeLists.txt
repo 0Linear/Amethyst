@@ -55,6 +55,8 @@ add_executable(amethyst
 	src/graphics/opengl/GLMisc.cpp
 	src/geometry/Model.cpp
 	src/Init.cpp
+	src/filesystem/Filesystem.cpp
+	src/filesystem/ADFParser.cpp
 	)
 
 target_link_libraries(amethyst glad)

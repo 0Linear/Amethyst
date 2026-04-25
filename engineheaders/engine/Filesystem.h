@@ -1,26 +1,11 @@
 #pragma once
 
-#include "engine/master.h"
 #include <fstream>
 #include <sstream>
 #include "vdfparser/vdfparser.hpp"
 #include <iostream>
 
-//TODO(stub)
 namespace Filesystem {
-    inline std::ifstream GetFile(const std::string& name, const std::ios_base::openmode& flags) {
-        return std::ifstream(name, flags);
-    }
-    inline VdfParser::KeyValue GetDataFile(const std::string& name) {
-        std::ifstream file(name);
-        if (!file.is_open()) {
-            Engine::Error("Error opening file: " + name);
-        }
-
-        std::stringstream buffer;
-        buffer << file.rdbuf();
-        file.close();
-
-        return VdfParser::fromString(buffer.str());
-    }
+    std::ifstream GetFile(const std::string& name, const std::ios_base::openmode& flags);
+    VdfParser::KeyValue GetDataFile(const std::string& name);
 }
