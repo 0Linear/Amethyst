@@ -3,10 +3,11 @@
 #include <glad/glad.h>
 #include "engine/Filesystem.h"
 #include <unordered_map>
+#include "engine/ADF.h"
 
 class STDGLShaderSystem {
     std::unordered_map<std::string, GLuint> ComputeShaders;
-    void InitCompute(VdfParser::KeyValue Shaderdefs);
+    void InitCompute(const ADFObject& Shaderdefs);
 public:
     void Init();
 

@@ -2,17 +2,17 @@
 #include "Shadinclude.hpp"
 #include "engine/master.h"
 
-void STDGLShaderSystem::InitCompute(VdfParser::KeyValue Shaderdefs) {
-    if (!Shaderdefs.getChildren().has_value()) return;
+void STDGLShaderSystem::InitCompute(const ADFObject& Shaderdefs) {
+    const auto& ShaderDefList = Shaderdefs.GetChildren();
+    if (ShaderDefList.empty()) return;
 
-    auto ShaderDefList = Shaderdefs.getChildren().value();
     for (const auto& shader : ShaderDefList) {
-        auto Shaderpath = shader.second.getChild("Source");
-        if (!Shaderpath.has_value()) {
+        if (!shader.second.HasChild("Source")) {
             std::cout << "Shader " + shader.first + " does not have a \"Source\", ignoring!" << std::endl;
             continue;
         }
-        std::string ShaderSrc = Shadinclude::load("scripts/shaders/opengl/" + std::get<std::string>(Shaderpath->value)); 
+        auto Shaderpath = shader.second["Source"];
+        std::string ShaderSrc = Shadinclude::load("scripts/shaders/opengl/" + Shaderpath.GetString()); 
         
         GLuint computeShader = glCreateShader(GL_COMPUTE_SHADER);
         auto ShaderSrc_Cstr = ShaderSrc.c_str();
@@ -50,10 +50,8 @@ void STDGLShaderSystem::InitCompute(VdfParser::KeyValue Shaderdefs) {
 
 
 void STDGLShaderSystem::Init() {
-    auto glshadersadf = Filesystem::GetDataFile("scripts/shaders/glshaders.adf").getChild("Shaders").value();
+    auto glshadersadf = ADFObject::FromFile("scripts/shaders/glshaders.adf")["Shaders"];
 
-    auto ComputeShaderDefs = glshadersadf.getChild("Compute");
-    if (ComputeShaderDefs.has_value()) {
-        InitCompute(ComputeShaderDefs.value());
-    }
+    auto ComputeShaderDefs = glshadersadf["Compute"];
+    InitCompute(ComputeShaderDefs);
 }

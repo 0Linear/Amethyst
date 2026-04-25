@@ -41,31 +41,64 @@ public:
     //! Creates an ADF tree from a .adf file.
     static ENGINEEXPORT ADFObject FromFile(std::string FilePath);
 
-    inline std::string GetString() {
+    inline std::string& GetString() {
         if (!std::holds_alternative<std::string>(data)) {
             Engine::Error("Tried to get a string value from a different type of an ADF entry!");
         }
         return std::get<std::string>(data);
     }
-    inline std::map<std::string, ADFObject> GetChildren() {
+    inline std::map<std::string, ADFObject>& GetChildren() {
         if (!std::holds_alternative<std::map<std::string, ADFObject>>(data)) {
             Engine::Error("Tried to get a list of children from a different type of an ADF entry!");
         }
         return std::get<std::map<std::string, ADFObject>>(data);
     }
-    inline std::vector<ADFObject> GetArray() {
+    inline std::vector<ADFObject>& GetArray() {
         if (!std::holds_alternative<std::vector<ADFObject>>(data)) {
             Engine::Error("Tried to get an array from a different type of an ADF entry!");
         }
         return std::get<std::vector<ADFObject>>(data);
     }
 
+    inline const std::string& GetString() const {
+        if (!std::holds_alternative<std::string>(data)) {
+            Engine::Error("Tried to get a string value from a different type of an ADF entry!");
+        }
+        return std::get<std::string>(data);
+    }
+    inline const std::map<std::string, ADFObject>& GetChildren() const {
+        if (!std::holds_alternative<std::map<std::string, ADFObject>>(data)) {
+            Engine::Error("Tried to get a list of children from a different type of an ADF entry!");
+        }
+        return std::get<std::map<std::string, ADFObject>>(data);
+    }
+    inline const std::vector<ADFObject>& GetArray() const {
+        if (!std::holds_alternative<std::vector<ADFObject>>(data)) {
+            Engine::Error("Tried to get an array from a different type of an ADF entry!");
+        }
+        return std::get<std::vector<ADFObject>>(data);
+    }
+
+
+
     inline ADFObject& operator[](int i) {
         return GetArray()[i];
     }
 
-    inline ADFObject& operator[](std::string name) {
+    inline ADFObject& operator[](const std::string& name) {
         return GetChildren().at(name);
+    }
+
+    inline const ADFObject& operator[](int i) const {
+        return GetArray()[i];
+    }
+
+    inline const ADFObject& operator[](const std::string& name) const {
+        return GetChildren().at(name);
+    }
+
+    inline bool HasChild(const std::string& name) const {
+        return GetChildren().contains(name);
     }
 
     //! Used for manual adding of entries.
