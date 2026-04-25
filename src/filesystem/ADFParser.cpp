@@ -56,7 +56,7 @@ ADFObject::Token ADFObject::Tokenizer::ReadToken() {
 ADFObject::ADFObject(ADFType Type, Tokenizer& Tokenizer) {
     switch (Type) {
     
-    case ADFType::map:
+    case ADFType::map: {
         data = std::map<std::string, ADFObject>();
         std::map<std::string, ADFObject>& mapdata = std::get<std::map<std::string, ADFObject>>(data);
 
@@ -93,6 +93,32 @@ ADFObject::ADFObject(ADFType Type, Tokenizer& Tokenizer) {
         }
 
         return;
+    }
+    case ADFType::array: {
+        data = std::vector<ADFObject>();
+        std::vector<ADFObject>& arraydata = std::get<std::vector<ADFObject>>(data);
+
+        while (true) {
+            Token Token = Tokenizer.ReadToken();
+
+            switch (Token.type) {
+                case TokenType::String:
+                    arraydata.emplace_back(ADFObject(Token.content.value()));
+                break;
+                case TokenType::StartObject:
+                    arraydata.emplace_back(ADFObject(ADFType::map, Tokenizer));
+                break;
+                case TokenType::StartArray:
+                    arraydata.emplace_back(ADFObject(ADFType::array, Tokenizer));
+                break;
+                case TokenType::End:
+                    return;
+            }
+        }
+
+        return;
+    }
+    
     }
 }
 
