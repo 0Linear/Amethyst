@@ -21,6 +21,8 @@
 
 #include "engine/master.h"
 
+#include "engine/ADF.h"
+
 // Time between current frame and last frame
 float deltaTime = 0.0f;	
 float lastFrame = 0.0f;
@@ -129,7 +131,7 @@ int main() {
 
 	std::cout << "Hello, world!" << std::endl;
 
-	auto datafilething = Filesystem::GetDataFile("scripts/shaders/glshaders.adf");
+	auto datafilething = ADFObject::FromFile("scripts/shaders/glshaders.adf");
 
 	while(EngineShouldNotTerminate) {
 		float currentFrame = static_cast<float>(glfwGetTime());
