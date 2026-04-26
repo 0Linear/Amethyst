@@ -1,15 +1,36 @@
 #include "STDGLCamera.h"
 #include "engine/master.h"
 #include "STDGLModel.h"
+#include "engine/ADF.h"
 
-STDGLModel::STDGLModel(std::string path = "error.glb") {
-    Geometry::Model model(path);
+STDGLModel::STDGLModel(std::string path = "") {
     Path = path;
-
-    LODCount = 1;
-    MeshCount = std::min((int)model.Meshes.size(), STDGLMODEL_MESH_MAX_COUNT);
-
     ModelInfo_t Info;
+    auto ModelADF = ADFEntry::FromFile("models/" + path);
+
+    LODCount = std::min((int)ModelADF["LODs"].GetArray().size(), STDGLMODEL_LOD_MAX_COUNT);
+
+    std::array<Geometry::Model, STDGLMODEL_LOD_MAX_COUNT> LODModels;
+
+    for (int LOD = 0; LOD < STDGLMODEL_LOD_MAX_COUNT; LOD++) {
+        Info.LODDistances[LOD] = INFINITY;
+    }
+
+    // Load the LOD models
+    for (int LOD = 0; LOD < LODCount; LOD++) {
+        const ADFEntry& LODEntry = ModelADF["LODs"][LOD];
+        LODModels[LOD] = Geometry::Model(LODEntry["Model"].GetString());
+        LODs[LOD].MeshCount = std::min((int)LODModels[LOD].Meshes.size(), STDGLMODEL_MESH_MAX_COUNT);
+
+        float possibledistance = INFINITY;
+
+        if (LODEntry.HasChild("Distance")) {
+            possibledistance = std::stof(LODEntry["Distance"].GetString());
+        }
+
+        Info.LODDistances[LOD] = (LOD > 0) ? possibledistance : 0.0f; // LOD 0 must always be distance 0
+    }
+
     glCreateBuffers(3, &VBO);
     glGenVertexArrays(1, &VAO);
     glBindVertexArray(VAO);
@@ -20,9 +41,11 @@ STDGLModel::STDGLModel(std::string path = "error.glb") {
     {   // Reserve the space
         int vertex_count_total = 0;
         int index_count_total = 0;
-        for (auto mesh : model.Meshes) {
-            vertex_count_total += mesh.Vertices.size();
-            index_count_total += mesh.Indeces.size();
+        for (int LOD = 0; LOD < LODCount; LOD++) {
+            for (const auto& mesh : LODModels[LOD].Meshes) {
+                vertex_count_total += mesh.Vertices.size();
+                index_count_total += mesh.Indeces.size();
+            }
         }
         vertices.reserve(vertex_count_total);
         indeces.reserve(index_count_total);
@@ -31,24 +54,24 @@ STDGLModel::STDGLModel(std::string path = "error.glb") {
     int mesh_base_vertex = 0;
     int mesh_base_index = 0;
 
-    int LOD = 0; //temp
+    for (int LOD = 0; LOD < LODCount; LOD++) {
+        for (int meshindex = 0; meshindex < LODs[LOD].MeshCount; meshindex++) {
+            const auto& mesh = LODModels[LOD].Meshes[meshindex];
 
-    for (int meshindex = 0; meshindex < MeshCount; meshindex++) {
-        const auto& mesh = model.Meshes[meshindex];
+            Info.IndirectBuffers[LOD][meshindex].count        = (unsigned int)mesh.Indeces.size();
+            Info.IndirectBuffers[LOD][meshindex].firstIndex   = mesh_base_index;
+            Info.IndirectBuffers[LOD][meshindex].baseVertex   = mesh_base_vertex;
+            Info.IndirectBuffers[LOD][meshindex].baseInstance = LOD;
 
-        Info.IndirectBuffers[LOD][meshindex].count        = (unsigned int)mesh.Indeces.size();
-        Info.IndirectBuffers[LOD][meshindex].firstIndex   = mesh_base_index;
-        Info.IndirectBuffers[LOD][meshindex].baseVertex   = mesh_base_vertex;
-        Info.IndirectBuffers[LOD][meshindex].baseInstance = LOD;
+            // Concatenate the vectors
+            std::copy(mesh.Vertices.cbegin(), mesh.Vertices.cend(), std::back_inserter(vertices));
+            std::copy(mesh.Indeces.cbegin(),  mesh.Indeces.cend(),  std::back_inserter(indeces));
 
-        // Concatenate the vectors
-        std::copy(mesh.Vertices.cbegin(), mesh.Vertices.cend(), std::back_inserter(vertices));
-        std::copy(mesh.Indeces.cbegin(),  mesh.Indeces.cend(),  std::back_inserter(indeces));
+            Info.Radius = std::max(Info.Radius, mesh.Radius);
 
-        Info.Radius = std::max(Info.Radius, mesh.Radius);
-
-        mesh_base_vertex += mesh.Vertices.size();
-        mesh_base_index  += mesh.Indeces.size();
+            mesh_base_vertex += mesh.Vertices.size();
+            mesh_base_index  += mesh.Indeces.size();
+        }
     }
     
     // Upload to the GPU

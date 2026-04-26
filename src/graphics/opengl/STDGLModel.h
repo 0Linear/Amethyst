@@ -1,7 +1,7 @@
 #pragma once
 
 #define STDGLMODEL_INSTANCE_MAX_COUNT 4096
-#define STDGLMODEL_LOD_MAX_COUNT 1
+#define STDGLMODEL_LOD_MAX_COUNT 4
 #define STDGLMODEL_MESH_MAX_COUNT 8
 #define STDGLMODEL_INSTANCE_PREPROCESS_GROUP_SIZE 256
 
@@ -19,8 +19,12 @@ class STDGLModel {
 public:
     void Draw() {
         glBindVertexArray(VAO);
-        for (int mesh = 0; mesh < MeshCount; mesh++) {
-            glDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_INT, (void*)(sizeof(DrawElementsIndirectCommand) * mesh));
+        for (int LOD = 0; LOD < LODCount; LOD++) {
+            for (int mesh = 0; mesh < LODs[LOD].MeshCount; mesh++) {
+                glDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_INT, 
+                    (void*)((sizeof(DrawElementsIndirectCommand) * STDGLMODEL_MESH_MAX_COUNT * LOD)
+                    + sizeof(DrawElementsIndirectCommand) * mesh));
+            }
         }
     }
     void DrawDepth();
@@ -36,9 +40,14 @@ public:
 
         Mesh() {};
     };
+    struct LOD {
+        uint8_t MeshCount;
+        Mesh Meshes[STDGLMODEL_MESH_MAX_COUNT];
+    };
     struct ModelInfo_t {
         DrawElementsIndirectCommand IndirectBuffers[STDGLMODEL_LOD_MAX_COUNT][STDGLMODEL_MESH_MAX_COUNT]; 
         float Radius = 0.0f;
+        float LODDistances[STDGLMODEL_LOD_MAX_COUNT];
         GLuint InstanceIndeces[STDGLMODEL_LOD_MAX_COUNT][STDGLMODEL_INSTANCE_MAX_COUNT];
     };
 
@@ -46,8 +55,7 @@ public:
     ~STDGLModel();
 
     uint8_t LODCount;
-    uint8_t MeshCount;
-    Mesh Meshes[STDGLMODEL_LOD_MAX_COUNT][STDGLMODEL_MESH_MAX_COUNT];
+    LOD LODs[STDGLMODEL_LOD_MAX_COUNT];
     std::string Path;
     GLuint VAO;
     GLuint VBO, EBO, ModelInfo;

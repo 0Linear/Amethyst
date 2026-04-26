@@ -8,7 +8,7 @@ void STDGLShaderSystem::InitCompute(const ADFEntry& Shaderdefs) {
 
     for (const auto& shader : ShaderDefList) {
         if (!shader.second.HasChild("Source")) {
-            std::cout << "Shader " + shader.first + " does not have a \"Source\", ignoring!" << std::endl;
+            Engine::Warning("Shader " + shader.first + " does not have a \"Source\", ignoring!");
             continue;
         }
         auto Shaderpath = shader.second["Source"];

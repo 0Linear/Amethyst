@@ -121,12 +121,12 @@ int main() {
 	std::array<std::shared_ptr<Camera>, 2> cameras;
 	//cameras[0] = rworld->MakeCamera(vec2(800, 600), "cam1");
 	cameras[1] = rworld->MakeCamera(vec2(800 * 4, 600 * 4), "cam2", vec3(1, 1, 1));
-	models[0] = rworld->MakeModelInstance("multimesh.glb");
-	models[1] = rworld->MakeModelInstance(".glb");
-	models[2] = rworld->MakeModelInstance("cube.glb");
+	models[0] = rworld->MakeModelInstance("multimesh.adf");
+	//models[1] = rworld->MakeModelInstance(".glb");
+	models[2] = rworld->MakeModelInstance("cube.adf");
 
 	for (int i = 0; i < 256; i++) {
-		extramodels.push_back(rworld->MakeModelInstance("Untitled2.glb"));
+		extramodels.push_back(rworld->MakeModelInstance("backpack.adf"));
 	}
 
 	std::cout << "Hello, world!" << std::endl;
@@ -142,7 +142,7 @@ int main() {
 
 		if (models[0])
 			models[0]->SetMatrix(mat4(1, 0, 0, -128));
-		models[1]->SetMatrix(mat4());
+		//models[1]->SetMatrix(mat4());
 
 		models[2]->SetMatrix(quat(vec3(0, position, 0)).MakeRotationMatrix() * mat4(10, 0, 0, -64,
 																					0, 10, 0, 0,

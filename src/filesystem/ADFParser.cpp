@@ -51,7 +51,7 @@ ADFEntry::Token ADFEntry::Tokenizer::ReadToken() {
         return Token(TokenType::String, TokenContent);
     }
 
-    Engine::Error("Unknown character in ADF file!(isn't this error impossible?)");
+    Engine::Error("Unknown character in ADF file!(Is this even an ADF file?)(File: " + filepath + ")");
 
     // Warning silencer.
     return Token();

@@ -33,8 +33,9 @@ class ADFEntry {
 
     class Tokenizer {
         std::ifstream filestream;
+        const std::string& filepath;
     public:
-        inline Tokenizer(std::string FilePath) {
+        inline Tokenizer(const std::string& FilePath) : filepath(FilePath) {
             filestream = Filesystem::GetFile(FilePath, std::ios::in | std::ios_base::binary);
         }
         Token ReadToken();

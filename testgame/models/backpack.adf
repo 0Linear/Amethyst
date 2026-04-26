@@ -1,0 +1,9 @@
+LODs [
+    {
+        Model "Untitled2.glb"
+    }
+    {
+    	Model "cube.glb"
+	    Distance 5
+    }
+]
