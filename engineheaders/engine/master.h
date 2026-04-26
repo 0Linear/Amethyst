@@ -24,8 +24,8 @@
 
 
 namespace Engine {
-    void ENGINEEXPORT Warning(std::string text);
-    void ENGINEEXPORT Error(std::string text);
+    void ENGINEEXPORT Warning(const std::string& text);
+    void ENGINEEXPORT Error(const std::string& text);
 }
 
 struct alignas(sizeof(float) * 4) vec3 {

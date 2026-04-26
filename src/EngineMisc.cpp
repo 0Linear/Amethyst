@@ -2,11 +2,11 @@
 #include <iostream>
 #include <cstdlib>
 
-void Engine::Warning(std::string text) {
+void Engine::Warning(const std::string& text) {
     std::cout << "The engine issued the following warning:\n\n" << text << std::endl;
 }
 
-void Engine::Error(std::string text) {
+void Engine::Error(const std::string& text) {
     std::cout << "The engine encountered an unrecoverable error!\n\n" << text << std::endl;
     std::abort();
 }

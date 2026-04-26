@@ -44,18 +44,22 @@ ADFEntry::Token ADFEntry::Tokenizer::ReadToken() {
         do {
             TokenContent.push_back(currchar);
             currchar = filestream.get();
-        } while (std::isgraph(currchar));
+        } while (std::isgraph(currchar) && currchar != '{' && currchar != '}' && currchar != '[' && currchar != ']' && currchar != '\"');
 
         TokenContent.shrink_to_fit();
 
         return Token(TokenType::String, TokenContent);
     }
 
+    Engine::Error("Unknown character in ADF file!(isn't this error impossible?)");
+
     // Warning silencer.
     return Token();
 }
 
-ADFEntry::ADFEntry(ADFType Type, Tokenizer& Tokenizer) {
+ADFEntry::ADFEntry(ADFType Type, Tokenizer& Tokenizer, std::shared_ptr<std::string> filename) {
+    Filename = filename;
+
     switch (Type) {
     
     case ADFType::map: {
@@ -72,9 +76,9 @@ ADFEntry::ADFEntry(ADFType Type, Tokenizer& Tokenizer) {
                 break;
             case TokenType::StartMap:
             case TokenType::StartArray:
-                Engine::Error("An ADF entry cannot be a key!");
+                ADFError("An ADF entry cannot be a key!");
             case TokenType::EndArray:
-                Engine::Error("Mismatched ADF closing brackets!(Tried to end a map with a square bracket)");
+                ADFError("Mismatched ADF closing brackets!(Tried to end a map with a square bracket)");
             case TokenType::EndMap:
             case TokenType::EndFile:
                 return;
@@ -84,19 +88,19 @@ ADFEntry::ADFEntry(ADFType Type, Tokenizer& Tokenizer) {
 
             switch (EntryToken.type) {
                 case TokenType::String:
-                    mapdata.emplace(std::move(key), String(EntryToken.content.value()));
+                    mapdata.emplace(std::move(key), ADFEntry(std::move(EntryToken.content.value()), filename));
                 break;
                 case TokenType::StartMap:
-                    mapdata.emplace(std::move(key), ADFEntry(ADFType::map, Tokenizer));
+                    mapdata.emplace(std::move(key), ADFEntry(ADFType::map, Tokenizer, filename));
                 break;
                 case TokenType::StartArray:
-                    mapdata.emplace(std::move(key), ADFEntry(ADFType::array, Tokenizer));
+                    mapdata.emplace(std::move(key), ADFEntry(ADFType::array, Tokenizer, filename));
                 break;
                 case TokenType::EndMap:
                 case TokenType::EndFile:
-                    Engine::Error("Incomplete ADF key/value pair!");
+                    ADFError("Incomplete ADF key/value pair!");
                 case TokenType::EndArray:
-                    Engine::Error("Incomplete ADF key/value pair!(And also it was closed with a square bracket!)");
+                    ADFError("Incomplete ADF key/value pair!(And also it was closed with a square bracket!)");
             }
         }
 
@@ -111,19 +115,19 @@ ADFEntry::ADFEntry(ADFType Type, Tokenizer& Tokenizer) {
 
             switch (Token.type) {
                 case TokenType::String:
-                    arraydata.emplace_back(String(Token.content.value()));
+                    arraydata.emplace_back(ADFEntry(std::move(Token.content.value()), filename));
                 break;
                 case TokenType::StartMap:
-                    arraydata.emplace_back(ADFEntry(ADFType::map, Tokenizer));
+                    arraydata.emplace_back(ADFEntry(ADFType::map, Tokenizer, filename));
                 break;
                 case TokenType::StartArray:
-                    arraydata.emplace_back(ADFEntry(ADFType::array, Tokenizer));
+                    arraydata.emplace_back(ADFEntry(ADFType::array, Tokenizer, filename));
                 break;
                 case TokenType::EndArray:
                 case TokenType::EndFile:
                     return;
                 case TokenType::EndMap:
-                    Engine::Error("Mismatched ADF closing brackets!(Tried to end an array with a curly brace)");
+                    ADFError("Mismatched ADF closing brackets!(Tried to end an array with a curly brace)");
             }
         }
 
@@ -133,7 +137,20 @@ ADFEntry::ADFEntry(ADFType Type, Tokenizer& Tokenizer) {
     }
 }
 
-ENGINEEXPORT ADFEntry ADFEntry::FromFile(std::string FilePath) {
+void ADFEntry::ADFError(std::string error) const {
+    std::ostringstream output;
+    output << error;
+    if (Filename) {
+        output << "(File: " << *Filename << ")";
+    } else {
+        output << "(Undetermined name of file.(Dynamically generated?))";
+    }
+
+    Engine::Error(output.str());
+}
+
+ENGINEEXPORT ADFEntry ADFEntry::FromFile(const std::string& FilePath) {
     Tokenizer Tokenizer(FilePath);
-    return ADFEntry(ADFType::map, Tokenizer);
+    auto filename = std::make_shared<std::string>(FilePath);
+    return ADFEntry(ADFType::map, Tokenizer, filename);
 }
