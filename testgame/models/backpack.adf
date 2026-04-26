@@ -4,6 +4,6 @@ LODs [
     }
     {
     	Model "cube.glb"
-	    Distance 5
+	    Distance 20.0
     }
 ]

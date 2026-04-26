@@ -27,6 +27,7 @@ public:
         mat4 View;
         mat4 ViewProjection;
         Shapes::Frustum Frustum;
+        vec3 CameraPos;
     };
     Camerainfo_t Info;
 

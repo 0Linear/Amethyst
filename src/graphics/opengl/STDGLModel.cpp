@@ -40,7 +40,7 @@ STDGLModel::STDGLModel(std::string path = "") {
             possibledistance = std::stof(LODEntry["Distance"].GetString());
         }
 
-        Info.LODDistances[LOD] = (LOD > 0) ? possibledistance : 0.0f; // LOD 0 must always be distance 0
+        Info.LODDistances[LOD] = (LOD > 0) ? possibledistance : -INFINITY; // LOD 0 must always be distance -INFINITY so that no distance is less than it
     }
 
     glCreateBuffers(3, &VBO);

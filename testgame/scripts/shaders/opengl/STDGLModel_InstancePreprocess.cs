@@ -6,9 +6,9 @@
 layout(local_size_x = STDGLMODEL_INSTANCE_PREPROCESS_GROUP_SIZE, local_size_y = 1, local_size_z = 1) in;
 
 bool InvPlaneTest(vec3 center, float radius, vec4 plane) {
-    float distance = dot(plane.xyz, center) + plane.w;
+    float Distance = dot(plane.xyz, center) + plane.w;
         
-    if (distance < -radius) {
+    if (Distance < -radius) {
         return true;
     }
     return false;
@@ -37,7 +37,11 @@ void main() {
         if (InvPlaneTest(position, radius, CameraFrustum[i]))
             isActive = false;
 
-    int LOD = 0; //temp
+
+    // Determine the LOD level
+    float DistanceFromCamera = distance(CameraPos, vec3(InstanceMatrices[gl_GlobalInvocationID.x][3]));
+    int LOD = STDGLMODEL_LOD_MAX_COUNT - 1;
+    while (DistanceFromCamera < LODDistances[LOD]) LOD--; 
 
     if (isActive) {
         uint ID = atomicAdd(IndirectBuffers[LOD][0].instanceCount, 1u);
