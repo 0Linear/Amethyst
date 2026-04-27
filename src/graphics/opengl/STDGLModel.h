@@ -51,7 +51,7 @@ public:
         GLuint InstanceIndices[STDGLMODEL_LOD_MAX_COUNT][STDGLMODEL_INSTANCE_MAX_COUNT];
     };
 
-    STDGLModel(std::string path);
+    STDGLModel(std::string path = "error.adf");
     ~STDGLModel();
 
     uint8_t LODCount;

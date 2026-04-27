@@ -3,7 +3,7 @@
 #include "STDGLModel.h"
 #include "engine/ADF.h"
 
-STDGLModel::STDGLModel(std::string path = "") {
+STDGLModel::STDGLModel(std::string path) {
     Path = path;
     ModelInfo_t Info;
     auto ModelADFFull = ADFEntry::FromFile("models/" + path);
