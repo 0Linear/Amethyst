@@ -1,5 +1,7 @@
-LODs [
-    {
-        Model "multimesh.glb"
-    }
-]
+Model {
+    LODs [
+        {
+            Model "multimesh.glb"
+        }
+    ]
+}

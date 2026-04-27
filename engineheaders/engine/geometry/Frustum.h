@@ -15,7 +15,7 @@ class alignas(alignof(vec4)) Shapes::Frustum {
     vec4 Front;
 
     inline void NormalizePlane(vec4& plane) {
-        float magnitude = reinterpret_cast<vec3*>(&plane)->length();
+        float magnitude = std::bit_cast<vec3>(plane).length();
 
         plane.x /= magnitude;
         plane.y /= magnitude;

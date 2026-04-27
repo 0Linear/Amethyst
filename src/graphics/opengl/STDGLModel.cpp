@@ -6,7 +6,14 @@
 STDGLModel::STDGLModel(std::string path = "") {
     Path = path;
     ModelInfo_t Info;
-    auto ModelADF = ADFEntry::FromFile("models/" + path);
+    auto ModelADFFull = ADFEntry::FromFile("models/" + path);
+
+    if (!ModelADFFull.HasChild("Model")) {
+        new (this) STDGLModel("error.adf");
+        return;
+    }
+
+    const auto& ModelADF = ModelADFFull["Model"];
 
     if (!ModelADF.HasChildren()) {
         new (this) STDGLModel("error.adf");
@@ -48,7 +55,7 @@ STDGLModel::STDGLModel(std::string path = "") {
     glBindVertexArray(VAO);
 
     std::vector<Shapes::Vertex> vertices;
-    std::vector<GLuint> indeces;
+    std::vector<GLuint> indices;
 
     {   // Reserve the space
         int vertex_count_total = 0;
@@ -56,11 +63,11 @@ STDGLModel::STDGLModel(std::string path = "") {
         for (int LOD = 0; LOD < LODCount; LOD++) {
             for (const auto& mesh : LODModels[LOD].Meshes) {
                 vertex_count_total += mesh.Vertices.size();
-                index_count_total += mesh.Indeces.size();
+                index_count_total += mesh.Indices.size();
             }
         }
         vertices.reserve(vertex_count_total);
-        indeces.reserve(index_count_total);
+        indices.reserve(index_count_total);
     }
 
     int mesh_base_vertex = 0;
@@ -70,26 +77,26 @@ STDGLModel::STDGLModel(std::string path = "") {
         for (int meshindex = 0; meshindex < LODs[LOD].MeshCount; meshindex++) {
             const auto& mesh = LODModels[LOD].Meshes[meshindex];
 
-            Info.IndirectBuffers[LOD][meshindex].count        = (unsigned int)mesh.Indeces.size();
+            Info.IndirectBuffers[LOD][meshindex].count        = (unsigned int)mesh.Indices.size();
             Info.IndirectBuffers[LOD][meshindex].firstIndex   = mesh_base_index;
             Info.IndirectBuffers[LOD][meshindex].baseVertex   = mesh_base_vertex;
             Info.IndirectBuffers[LOD][meshindex].baseInstance = LOD;
 
             // Concatenate the vectors
             std::copy(mesh.Vertices.cbegin(), mesh.Vertices.cend(), std::back_inserter(vertices));
-            std::copy(mesh.Indeces.cbegin(),  mesh.Indeces.cend(),  std::back_inserter(indeces));
+            std::copy(mesh.Indices.cbegin(),  mesh.Indices.cend(),  std::back_inserter(indices));
 
             Info.Radius = std::max(Info.Radius, mesh.Radius);
 
             mesh_base_vertex += mesh.Vertices.size();
-            mesh_base_index  += mesh.Indeces.size();
+            mesh_base_index  += mesh.Indices.size();
         }
     }
     
     // Upload to the GPU
     glNamedBufferData(VBO, vertices.size() * sizeof(Shapes::Vertex), vertices.data(), GL_STATIC_DRAW);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glNamedBufferData(EBO, indeces.size() * sizeof(GLuint), indeces.data(), GL_STATIC_DRAW);
+    glNamedBufferData(EBO, indices.size() * sizeof(GLuint), indices.data(), GL_STATIC_DRAW);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 
     glNamedBufferData(ModelInfo, sizeof(ModelInfo_t), &Info, GL_STATIC_DRAW);
@@ -121,7 +128,7 @@ void STDGLModelInstance::SetMatrix(mat4 Matrix) {
 STDGLModelInstance::~STDGLModelInstance() {
     parent->InstanceBufferMapped[0].InstanceMatrices[index][0, 0] = NAN;
     parent->InstanceBufferMapped[1].InstanceMatrices[index][0, 0] = NAN;
-    parent->FreedIndeces.push(index);
+    parent->FreedIndices.push(index);
 }
 
 
@@ -152,12 +159,12 @@ STDGLModelInstanceArray::~STDGLModelInstanceArray() {
 
 std::unique_ptr<ModelInstance> STDGLModelInstanceArray::MakeModelInstance() {
     uint16_t index;
-    if (FreedIndeces.empty()) {
+    if (FreedIndices.empty()) {
         index = NextIndex;
         NextIndex++;
     } else {
-        index = FreedIndeces.front();
-        FreedIndeces.pop();
+        index = FreedIndices.front();
+        FreedIndices.pop();
     }
     if (index >= STDGLMODEL_INSTANCE_MAX_COUNT)
         Engine::Error("Attempted to create more than STDGLMODEL_INSTANCE_MAX_COUNT instances of the same model!");

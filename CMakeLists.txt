@@ -19,17 +19,14 @@ endif()
 # set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -pg")
 
 
-
-include_directories(include)
-include_directories(engineheaders)
-
 # include the libraries
 add_subdirectory(libs/glfw)
 add_library(glad STATIC src/one-off_libs/glad.c)
+target_include_directories(glad PRIVATE include)
 
-include_directories("libs/imgui")
 file(GLOB_RECURSE imgui_sources      libs/imgui/*.cpp)
 add_library(imgui ${imgui_sources})
+target_include_directories(imgui PRIVATE "libs/imgui")
 
 add_library(assimp SHARED IMPORTED)
 if(WIN32)
@@ -62,19 +59,25 @@ target_link_libraries(amethyst glfw)
 target_link_libraries(amethyst imgui)
 target_link_libraries(amethyst assimp)
 
+target_include_directories(amethyst PRIVATE include)
+target_include_directories(amethyst PRIVATE engineheaders)
+target_include_directories(amethyst PRIVATE "include")
+target_include_directories(amethyst PRIVATE "libs/imgui")
 
-target_compile_definitions(amethyst PUBLIC AMETHYSTENGINESRC)
+
+
+target_compile_definitions(amethyst PRIVATE AMETHYSTENGINESRC)
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-	target_compile_options(amethyst PUBLIC "-DDEBUG")
+	target_compile_options(amethyst PRIVATE "-DDEBUG")
 endif()
 
 if(UNIX)
-	target_link_options(amethyst PUBLIC "-rdynamic" "-Wl,-rpath,./")
-	target_compile_options(amethyst PUBLIC "-fvisibility=hidden")
+	target_link_options(amethyst PRIVATE "-rdynamic" "-Wl,-rpath,./")
+	target_compile_options(amethyst PRIVATE "-fvisibility=hidden")
 endif()
 
 if(WIN32)
 	set_target_properties(amethyst PROPERTIES ENABLE_EXPORTS ON)
-    target_link_options(amethyst PUBLIC "-Wl,--out-implib,${CMAKE_CURRENT_BINARY_DIR}/libamethyst.dll.a")
+    target_link_options(amethyst PRIVATE "-Wl,--out-implib,${CMAKE_CURRENT_BINARY_DIR}/libamethyst.dll.a")
 endif()

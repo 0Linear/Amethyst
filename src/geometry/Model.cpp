@@ -51,10 +51,10 @@ Geometry::Mesh::Mesh(void* Meshdata) {
         Radius = std::max(Radius, vertex.Position.length());
         Vertices.push_back(vertex);
     }
-    Indeces.reserve(paimesh->mNumFaces * 3);
+    Indices.reserve(paimesh->mNumFaces * 3);
     for (int faceindex = 0; faceindex < paimesh->mNumFaces; faceindex++) {
         for (int indexindex = 0; indexindex < 3; indexindex++) {
-            Indeces.push_back(paimesh->mFaces[faceindex].mIndices[indexindex]);
+            Indices.push_back(paimesh->mFaces[faceindex].mIndices[indexindex]);
         }
     }
 }

@@ -8,7 +8,6 @@ std::shared_ptr<Renderer> Renderer::Make(std::string classname) {
         if (makefunc.first == classname) return makefunc.second();
     }
     Engine::Error("Tried to instanciate an unknown Renderer type!");
-    return nullptr; // To silence the warning
 }
 
 void Renderer::AddRenderer(const std::string classname, std::shared_ptr<Renderer> (*makefunc)() ) {

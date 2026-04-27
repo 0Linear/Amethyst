@@ -1,7 +1,7 @@
 Model {
     LODs [
         {
-            Model "cube.glb"
+            Model "sphere.glb"
         }
     ]
 }

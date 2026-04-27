@@ -21,7 +21,7 @@ void GLMisc::windowFocusCallback(GLFWwindow* window, int focused) {
     auto* WindowObject = reinterpret_cast<STDGLWindow*>(glfwGetWindowUserPointer(window));
     ImGui::SetCurrentContext(WindowObject->UIData);
 
-    if (focused = GLFW_TRUE) {
+    if (focused == GLFW_TRUE) {
         WindowObject->ProcessCursorEating();
     } else {
         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);

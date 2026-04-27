@@ -10,7 +10,7 @@
 #include "engine/graphics/ModelInstance.h"
 #include "engine/geometry/Model.h"
 #include "GLFW/glfw3.h"
-#include "InderectDrawBuffer.h"
+#include "IndirectDrawBuffer.h"
 #include <cstdint>
 #include <memory>
 #include <queue>
@@ -48,7 +48,7 @@ public:
         DrawElementsIndirectCommand IndirectBuffers[STDGLMODEL_LOD_MAX_COUNT][STDGLMODEL_MESH_MAX_COUNT]; 
         float Radius = 0.0f;
         float LODDistances[STDGLMODEL_LOD_MAX_COUNT];
-        GLuint InstanceIndeces[STDGLMODEL_LOD_MAX_COUNT][STDGLMODEL_INSTANCE_MAX_COUNT];
+        GLuint InstanceIndices[STDGLMODEL_LOD_MAX_COUNT][STDGLMODEL_INSTANCE_MAX_COUNT];
     };
 
     STDGLModel(std::string path);
@@ -69,7 +69,7 @@ public:
 
     GLFWwindow* rendererData;
     GLuint InstanceBuffer = 0;
-    std::queue<uint16_t> FreedIndeces;
+    std::queue<uint16_t> FreedIndices;
     uint16_t NextIndex = 0;
     std::shared_ptr<STDGLModel> Model;
     std::weak_ptr<STDGLModelInstanceArray> selfRef;

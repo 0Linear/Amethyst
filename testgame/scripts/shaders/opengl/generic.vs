@@ -24,7 +24,7 @@ struct IndirectDrawBuffer {
 layout (std430, binding = 0) buffer ModelInfo {
     IndirectDrawBuffer IndirectBuffers[STDGLMODEL_LOD_MAX_COUNT][STDGLMODEL_MESH_MAX_COUNT]; 
     float ModelRadius;
-    uint InstanceIndeces[STDGLMODEL_LOD_MAX_COUNT][STDGLMODEL_INSTANCE_MAX_COUNT];
+    uint InstanceIndices[STDGLMODEL_LOD_MAX_COUNT][STDGLMODEL_INSTANCE_MAX_COUNT];
 };
 
 layout (std430, binding = 1) buffer InstanceBuffer {
@@ -32,5 +32,5 @@ layout (std430, binding = 1) buffer InstanceBuffer {
 };
 
 void main() {
-    gl_Position = CameraViewProjection * InstanceMatrices[InstanceIndeces[gl_BaseInstance][gl_InstanceID]] * vec4(aPos, 1.0f);
+    gl_Position = CameraViewProjection * InstanceMatrices[InstanceIndices[gl_BaseInstance][gl_InstanceID]] * vec4(aPos, 1.0f);
 }

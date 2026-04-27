@@ -1,5 +1,7 @@
-LODs [
-    {
-        Model "error.glb"
-    }
-]
+Model {
+    LODs [
+        {
+            Model "error.glb"
+        }
+    ]
+}

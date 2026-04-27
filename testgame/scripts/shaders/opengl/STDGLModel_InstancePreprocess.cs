@@ -45,6 +45,6 @@ void main() {
 
     if (isActive) {
         uint ID = atomicAdd(IndirectBuffers[LOD][0].instanceCount, 1u);
-        InstanceIndeces[LOD][ID] = gl_GlobalInvocationID.x;
+        InstanceIndices[LOD][ID] = gl_GlobalInvocationID.x;
     }
 }

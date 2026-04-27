@@ -35,8 +35,7 @@ void STDGLCamera::ProcessMouseMovement(vec2 offset, bool constrainPitch)
     Pitch -= offset.y;
 
     // make sure that when pitch is out of bounds, screen doesn't get flipped
-    if (constrainPitch)
-    {
+    if (constrainPitch) {
         if (Pitch > 89.0f)
             Pitch = 89.0f;
         if (Pitch < -89.0f)

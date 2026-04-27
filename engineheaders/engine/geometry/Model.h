@@ -16,7 +16,7 @@ namespace Geometry {
     public:
         Mesh() = delete;
         std::vector<Shapes::Vertex> Vertices;
-        std::vector<uint32_t> Indeces;
+        std::vector<uint32_t> Indices;
         float Radius = 0.0f;
     };
 

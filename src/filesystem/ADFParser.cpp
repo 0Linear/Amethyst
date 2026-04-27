@@ -52,9 +52,6 @@ ADFEntry::Token ADFEntry::Tokenizer::ReadToken() {
     }
 
     Engine::Error("Unknown character in ADF file!(Is this even an ADF file?)(File: " + filepath + ")");
-
-    // Warning silencer.
-    return Token();
 }
 
 ADFEntry::ADFEntry(ADFType Type, Tokenizer& Tokenizer, std::shared_ptr<std::string> filename) {
