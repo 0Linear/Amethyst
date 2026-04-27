@@ -134,7 +134,7 @@ ADFEntry::ADFEntry(ADFType Type, Tokenizer& Tokenizer, std::shared_ptr<std::stri
     }
 }
 
-void ADFEntry::ADFError(std::string error) const {
+void ADFEntry::ADFError(const std::string& error) const {
     std::ostringstream output;
     output << error;
     if (Filename) {

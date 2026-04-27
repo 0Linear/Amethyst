@@ -24,7 +24,7 @@ class ADFEntry {
         TokenType type;
         std::optional<std::string> content;
         inline Token() {}
-        inline Token (TokenType Type, std::optional<std::string> Content = std::nullopt) { type = Type; content = Content; }
+        inline Token (TokenType Type, std::optional<std::string> Content = std::nullopt) { type = std::move(Type); content = std::move(Content); }
     };
 
     std::variant<std::map<std::string, ADFEntry>, std::string, std::vector<ADFEntry>> data;
@@ -41,7 +41,7 @@ class ADFEntry {
         Token ReadToken();
     };
 
-    void ADFError(std::string error) const;
+    void ADFError(const std::string& error) const;
 
     ADFEntry(ADFType Type, Tokenizer& Tokenizer, std::shared_ptr<std::string> filename);
     ADFEntry(std::string content, std::shared_ptr<std::string> filename) { data = std::move(content); filename = filename; }
@@ -57,13 +57,13 @@ public:
     //! Used for manual adding of array-type entries.
     inline static ADFEntry Array(std::vector<ADFEntry> Content = std::vector<ADFEntry>()) { ADFEntry ret; ret.data = Content; return ret; }
 
-    inline bool IsString() {
+    inline bool IsString() const {
         return std::holds_alternative<std::string>(data);
     }
-    inline bool IsMap() {
+    inline bool IsMap() const {
         return std::holds_alternative<std::map<std::string, ADFEntry>>(data);
     }
-    inline bool IsArray() {
+    inline bool IsArray() const {
         return std::holds_alternative<std::vector<ADFEntry>>(data);
     }
     inline std::string& GetString() {
@@ -86,19 +86,19 @@ public:
     }
 
     inline const std::string& GetString() const {
-        if (!std::holds_alternative<std::string>(data)) {
+        if (!IsString()) {
             ADFError("Tried to get a string value from a different type of an ADF entry!");
         }
         return std::get<std::string>(data);
     }
     inline const std::map<std::string, ADFEntry>& GetChildren() const {
-        if (!std::holds_alternative<std::map<std::string, ADFEntry>>(data)) {
+        if (!IsMap()) {
             ADFError("Tried to get a list of children from a different type of an ADF entry!");
         }
         return std::get<std::map<std::string, ADFEntry>>(data);
     }
     inline const std::vector<ADFEntry>& GetArray() const {
-        if (!std::holds_alternative<std::vector<ADFEntry>>(data)) {
+        if (!IsArray()) {
             ADFError("Tried to get an array from a different type of an ADF entry!");
         }
         return std::get<std::vector<ADFEntry>>(data);
