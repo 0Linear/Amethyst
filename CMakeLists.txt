@@ -27,6 +27,7 @@ target_include_directories(glad PRIVATE include)
 file(GLOB_RECURSE imgui_sources      libs/imgui/*.cpp)
 add_library(imgui ${imgui_sources})
 target_include_directories(imgui PRIVATE "libs/imgui")
+target_include_directories(imgui PRIVATE "include")
 
 add_library(assimp SHARED IMPORTED)
 if(WIN32)
