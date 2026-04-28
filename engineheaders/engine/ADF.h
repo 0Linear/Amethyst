@@ -6,7 +6,16 @@
 #include <string>
 #include <vector>
 #include <memory>
-
+/*!
+*  \brief Runtime version of an entry from an Amethyst Data Format(.adf) file.
+*
+*   An entry can be of 3 different types:
+*   - A map
+*   - An array
+*   - A string
+*
+*   Due to how annoying it could be to hunt down malformed/wrongly interpreted ADF trees the engine will raise an Engine::Error when attempting to read an entry as a different type than it is and will also show which file the error came from.
+*/
 class ADFEntry {
     enum class ADFType {
         map,
@@ -28,6 +37,7 @@ class ADFEntry {
     };
 
     std::variant<std::map<std::string, ADFEntry>, std::string, std::vector<ADFEntry>> data;
+    // This is used for showing which file an error came from
     std::shared_ptr<std::string> Filename = nullptr;
 
 
@@ -50,11 +60,11 @@ public:
     //! Creates an ADF tree from a .adf file.
     static ENGINEEXPORT ADFEntry FromFile(const std::string& FilePath);
 
-    //! Used for manual adding of string-type entries.
+    //! Used for manual creation of string-type entries.
     inline static ADFEntry String(std::string Content = std::string()) { ADFEntry ret; ret.data = Content; return ret; }
-    //! Used for manual adding of map-type entries.
+    //! Used for manual creation of map-type entries.
     inline static ADFEntry Map(std::map<std::string, ADFEntry> Content = std::map<std::string, ADFEntry>()) { ADFEntry ret; ret.data = Content; return ret; }
-    //! Used for manual adding of array-type entries.
+    //! Used for manual creation of array-type entries.
     inline static ADFEntry Array(std::vector<ADFEntry> Content = std::vector<ADFEntry>()) { ADFEntry ret; ret.data = Content; return ret; }
 
     inline bool IsString() const {

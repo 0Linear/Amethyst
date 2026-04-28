@@ -15,7 +15,7 @@
 *  \brief The standard renderer interface, every renderer must conform to it.
 *
 *   Also provides the function for adding a window. \n
-*   The renderer does ***not*** count as a reference to anything within it.
+*   The renderer does ***not*** count as a reference to anything within it, hovewer, any resource reference that can be gotten from it ***will*** count as a reference to the renderer owning it
 */
 class ENGINEEXPORT Renderer {
 protected:
@@ -28,7 +28,7 @@ public:
     virtual std::shared_ptr<Window> MakeWindow() = 0;
     //! Makes a Render World.(Note: Supposed to only be used for game worlds, use separately at your own risk!)
     virtual std::shared_ptr<RWorld> MakeRWorld() = 0;
-    //! Gets a camera.(used for getting the camera's render result in window UI functions)
+    //! Gets a camera.(Used for getting the camera's render result in window UI functions.)
     virtual Camera* GetCamera(std::string name) = 0;
     //! Gets a constant reference to the internal frame counter
     virtual const uint64_t& GetFrameCounter() = 0;
