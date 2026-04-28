@@ -1,8 +1,5 @@
 #include "Init.h"
-#include <GLFW/glfw3.h>
-#include "engine/graphics/Renderer.h"
-
-class STDGLRenderer { public: static std::shared_ptr<Renderer> Make(); };
+#include "graphics/opengl/STDGLRenderer.h"
 
 static void exitfunc() {
 	glfwTerminate();

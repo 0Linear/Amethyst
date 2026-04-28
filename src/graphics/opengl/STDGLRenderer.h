@@ -7,8 +7,8 @@
 #include <vector>
 #include <cstdint>
 #include "engine/weak_vector.h"
-#include "STDGLWindow.h"
 #include "STDGLModel.h"
+#include "STDGLWindow.h"
 #include "STDGLShaderSystem.h"
 
 /*!
