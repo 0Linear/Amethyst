@@ -8,7 +8,7 @@
 #include <backends/imgui_impl_opengl3.h>
 #include <GLFW/glfw3.h>
 
-void STDGLWindow::EatCursor(bool state) {
+void STDGLWindow::SetEatCursor(bool state) {
     ShouldEatCursor = state;
     ProcessCursorEating();
 }
@@ -29,6 +29,17 @@ bool STDGLWindow::IsWindowInFocus() {
     return glfwGetWindowAttrib(data, GLFW_FOCUSED);
 }
 
+
+void STDGLWindow::SetName(std::string name) {
+    Name = name;
+    Update();
+}
+void STDGLWindow::SetResolution(int x, int y) {
+    Width = x;
+    Height = y;
+    Update();
+}
+
 void STDGLWindow::Update() {
     if (data != nullptr) {
         ImGui::SetCurrentContext(UIData);
@@ -43,7 +54,7 @@ void STDGLWindow::Update() {
     glfwDefaultWindowHints();
 
 	glfwWindowHint(GLFW_SAMPLES, 16);
-    data = glfwCreateWindow(Resolution.x, Resolution.y, Name.c_str(), NULL, reinterpret_cast<GLFWwindow*>(rendererData));
+    data = glfwCreateWindow(Width, Height, Name.c_str(), NULL, reinterpret_cast<GLFWwindow*>(rendererData));
 
     ProcessCursorEating();
 
@@ -76,14 +87,18 @@ STDGLWindow::~STDGLWindow() {
     }
 };
 
-STDGLWindow::STDGLWindow(std::weak_ptr<Renderer> RendererWeakPtr, GLFWwindow* RendererDataPtr) {
+STDGLWindow::STDGLWindow(std::weak_ptr<Renderer> RendererWeakPtr, GLFWwindow* RendererDataPtr, int ResX, int ResY, std::string name) {
     rendererData = RendererDataPtr;
     rendererRef = RendererWeakPtr.lock();
+    Width = ResX;
+    Height = ResY;
+    Name = name;
+    Update();
 }
 
 void STDGLWindow::Draw() {
     glfwMakeContextCurrent(data);
-    glViewport(0, 0, Resolution.x, Resolution.y);
+    glViewport(0, 0, Width, Height);
     
     ImGui::SetCurrentContext(UIData);
     ImGui_ImplOpenGL3_NewFrame();

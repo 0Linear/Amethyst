@@ -13,6 +13,7 @@
 */
 class RWorld {
 protected:
+    //!@private
     bool SkipRendering = false;
 public:
     //! Makes a camera.

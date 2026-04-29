@@ -25,7 +25,7 @@ protected:
 public:
     virtual ~Renderer() {}; //the compiler compains if this doesn't exist
     //! Makes a window.
-    virtual std::shared_ptr<Window> MakeWindow() = 0;
+    virtual std::shared_ptr<Window> MakeWindow(int x = 800, int y = 600, std::string name = "Unnamed window") = 0;
     //! Makes a Render World.(Note: Supposed to only be used for game worlds, use separately at your own risk!)
     virtual std::shared_ptr<RWorld> MakeRWorld() = 0;
     //! Gets a camera.(Used for getting the camera's render result in window UI functions.)

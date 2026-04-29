@@ -53,8 +53,8 @@ STDGLRenderer::~STDGLRenderer() {
 }
 
 
-std::shared_ptr<Window> STDGLRenderer::MakeWindow() {
-    std::shared_ptr<STDGLWindow> tempRef = std::make_shared<STDGLWindow>(selfRef, rendererData);
+std::shared_ptr<Window> STDGLRenderer::MakeWindow(int x, int y, std::string name) {
+    std::shared_ptr<STDGLWindow> tempRef = std::make_shared<STDGLWindow>(selfRef, rendererData, x, y, name);
     WindowVector.push_back(tempRef);
     return static_pointer_cast<Window>(tempRef);
 }

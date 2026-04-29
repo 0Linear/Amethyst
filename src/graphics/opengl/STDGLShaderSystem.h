@@ -1,9 +1,9 @@
 #pragma once
 
 #include <glad/glad.h>
-#include "engine/Filesystem.h"
+#include "engine/filesystem/Filesystem.h"
 #include <unordered_map>
-#include "engine/ADF.h"
+#include "engine/filesystem/ADF.h"
 
 class STDGLShaderSystem {
     std::unordered_map<std::string, GLuint> ComputeShaders;

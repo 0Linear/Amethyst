@@ -1,5 +1,5 @@
-#include "engine/Filesystem.h"
-#include "engine/ADF.h"
+#include "engine/filesystem/Filesystem.h"
+#include "engine/filesystem/ADF.h"
 #include <cctype>
 
 ADFEntry::Token ADFEntry::Tokenizer::ReadToken() {

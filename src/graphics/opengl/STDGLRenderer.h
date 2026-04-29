@@ -38,5 +38,5 @@ public:
     Camera* GetCamera(std::string name);
     const uint64_t& GetFrameCounter();
     void Draw();
-    std::shared_ptr<Window> MakeWindow();
+    std::shared_ptr<Window> MakeWindow(int x, int y, std::string name);
 };

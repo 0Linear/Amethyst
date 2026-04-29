@@ -10,7 +10,7 @@
 #include "engine/graphics/RWorld.h"
 #include "engine/graphics/Renderer.h"
 #include "imgui.h"
-#include "engine/Filesystem.h"
+#include "engine/filesystem/Filesystem.h"
 
 #include "main.h"
 #include "Init.h"
@@ -21,7 +21,7 @@
 
 #include "engine/master.h"
 
-#include "engine/ADF.h"
+#include "engine/filesystem/ADF.h"
 
 // Time between current frame and last frame
 float deltaTime = 0.0f;	
@@ -42,7 +42,7 @@ std::function<void(Renderer*, Window*)> mainuifunction = [](Renderer* renderer, 
 
 	if (ImGui::IsKeyPressed(ImGuiKey_Z, false)) {
 		isUsingCamera = !isUsingCamera;
-		window->EatCursor(isUsingCamera);
+		window->SetEatCursor(isUsingCamera);
 	}
 
 	Camera* camera = renderer->GetCamera("cam2");
@@ -112,11 +112,8 @@ int main() {
 	Engine::Init();
 
 	std::shared_ptr<Renderer> openglrenderer = Renderer::Make("STDGLRenderer");
-	std::shared_ptr<Window> enginewindow = openglrenderer->MakeWindow();
-	enginewindow->Name = "Amethyst";
-	enginewindow->Update();
+	std::shared_ptr<Window> enginewindow = openglrenderer->MakeWindow(800, 600, "Amethyst");
 	enginewindow->SetUIFunction(mainuifunction);
-	//enginewindow->EatCursor(true);
 	auto rworld = openglrenderer->MakeRWorld();
 	std::array<std::shared_ptr<Camera>, 2> cameras;
 	//cameras[0] = rworld->MakeCamera(vec2(800, 600), "cam1");
