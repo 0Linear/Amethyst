@@ -22,7 +22,7 @@
 #include "engine/master.h"
 
 #include "engine/filesystem/ADF.h"
-#include "engine/world/Entity.h"
+#include "engine/entities/Entity.h"
 
 // Time between current frame and last frame
 float deltaTime = 0.0f;	
@@ -112,17 +112,19 @@ std::function<void(Renderer*, Window*)> mainuifunction = [](Renderer* renderer, 
 int main() {
 	Engine::Init();
 
-	auto entityfile = ADFEntry::FromFile("testentity.adf");
-	BaseEntityHandler<BaseEntity>::PropertyInit();
-
-	BaseEntityHandler<BaseEntity> tmpentityhandler(entityfile["classname"].GetString(), entityfile["properties"]);
-
-	auto entitysaved = tmpentityhandler.ToADF();
-	//std::cout << (std::get<int BaseEntity::*>(tmpentityhandler.Properties.at("position").data)) << std::endl;
 	std::shared_ptr<Renderer> openglrenderer = Renderer::Make("STDGLRenderer");
+	auto rworld = openglrenderer->MakeRWorld();
+
+	World tmpworld(rworld);
+	auto savefile = ADFEntry::FromFile("saves/testsave.adf");
+	tmpworld.Restore(savefile);
+
+	auto newsavefile = tmpworld.Save();
+
+	auto tmpentityhandler = tmpworld[0];
+
 	std::shared_ptr<Window> enginewindow = openglrenderer->MakeWindow(800, 600, "Amethyst");
 	enginewindow->SetUIFunction(mainuifunction);
-	auto rworld = openglrenderer->MakeRWorld();
 	std::array<std::shared_ptr<Camera>, 2> cameras;
 	//cameras[0] = rworld->MakeCamera(vec2(800, 600), "cam1");
 	cameras[1] = rworld->MakeCamera(vec2(800 * 4, 600 * 4), "cam2", vec3(1, 1, 1));
@@ -159,6 +161,8 @@ int main() {
 		for (auto& model : extramodels) {
 			model->SetMatrix(mat4());
 		}
+
+		tmpworld.Update();
 
 		openglrenderer->Draw();
 		

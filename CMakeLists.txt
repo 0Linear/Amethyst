@@ -9,7 +9,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 if (MSVC)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /arch:AVX")
-elseif (CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
+elseif (CMAKE_C_COMPILER_ID MATCHES "GNU")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mavx")
 endif()
 
@@ -40,7 +40,7 @@ endif()
 add_executable(amethyst
 	src/main.cpp
 	
-	src/EngineMisc.cpp
+	src/utils/EngineMisc.cpp
 	src/graphics/Rendering.cpp
 	src/graphics/opengl/STDGLRenderer.cpp
 	src/graphics/opengl/STDGLCamera.cpp
@@ -53,6 +53,8 @@ add_executable(amethyst
 	src/Init.cpp
 	src/filesystem/Filesystem.cpp
 	src/filesystem/ADFParser.cpp
+	src/entities/World.cpp
+	src/entities/BasicEntities.cpp
 	)
 
 target_link_libraries(amethyst glad)

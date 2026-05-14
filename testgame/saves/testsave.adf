@@ -1,0 +1,17 @@
+"Savefile" {
+    "MapName" ""
+    "Entities" {
+        "0" {
+            "classname" "prop_dynamic"
+            "properties" {
+                "targetname" not\ quoted
+                "position" { x 128 y 0 z 128 }
+                "model" "multimesh.adf"
+                "angles" { x 45 y 180 z 45 }
+                "scale" { x 1 y 3 z 5 }
+            }
+            "children" {}
+            "tags" []
+        }
+    }
+}

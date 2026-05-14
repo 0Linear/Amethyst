@@ -1,4 +1,5 @@
 #pragma once
+#include "engine/filesystem/Filesystem.h"
 #include "engine/master.h"
 #include <variant>
 #include <optional>
@@ -229,7 +230,7 @@ public:
     inline quat GetQuat() const {
         const auto& map = GetChildren();
 
-        if (map.contains("x") && map.contains("y") && map.contains("z") && map.contains("2")) {
+        if (map.contains("x") && map.contains("y") && map.contains("z") && map.contains("w")) {
             return quat(std::stof(map.at("x").GetString()), std::stof(map.at("y").GetString()), std::stof(map.at("z").GetString()), std::stof(map.at("w").GetString()));
         }
 
