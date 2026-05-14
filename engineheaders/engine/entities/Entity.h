@@ -8,10 +8,12 @@
 #include <functional>
 #include "World.h"
 
-struct iEntHandler : public EntityStorage {
+struct iEntHandler {
     // Set by the world once the entity is made.
     int slot = -1;
     World* world = nullptr;
+
+    EntityStorage Children;
 
     virtual void SetProperty(const std::string& name, ADFEntry property) = 0;
     virtual std::optional<ADFEntry> GetProperty(const std::string& name) = 0;
@@ -34,7 +36,7 @@ struct iEntHandler : public EntityStorage {
     virtual void Remove() {
         auto parent = GetParent();
         if (parent) {
-            (*parent.value())[slot] = nullptr;
+            parent.value()->Children[slot] = nullptr;
             return;
         }
         (*world)[slot] = nullptr;

@@ -21,7 +21,7 @@ ADFEntry World::EntityStorageToADF(EntityStorage* Storage) {
 
         Saved.emplace("classname",  ADFEntry::String(Handler->GetClassname()));
         Saved.emplace("properties", Handler->PropertiesToADF());
-        Saved.emplace("children",   EntityStorageToADF(Handler.get()));
+        Saved.emplace("children",   EntityStorageToADF(&Handler->Children));
         Saved.emplace("tags",       Handler->TagsToADF());
     }
 
@@ -45,7 +45,7 @@ void World::EntityStorageFromADF(const ADFEntry& Saved, EntityStorage* Storage, 
         for (const auto& tag : SavedEntity.second["tags"].GetArray()) { Handler->AddTag(tag.GetString()); }
         (*Storage)[slot] = Handler;
         Handler->slot = slot;
-        EntityStorageFromADF(SavedEntity.second["children"], Handler.get(), Handler.get());
+        EntityStorageFromADF(SavedEntity.second["children"], &Handler->Children, Handler.get());
         Handler->InitEntity();
     }
 }
@@ -85,8 +85,8 @@ std::shared_ptr<iEntHandler> World::MakeEntity(std::string classname, std::optio
 
     int index;
     if (parent) {
-        index = parent.value()->GetFreeIndex();
-        (*parent.value())[index] = Handler;
+        index = parent.value()->Children.GetFreeIndex();
+        parent.value()->Children[index] = Handler;
     } else {
         index = GetFreeIndex();
         (*this)[index] = Handler;
@@ -138,7 +138,10 @@ int EntityStorage::GetFreeIndex() {
 
 void EntityStorage::Update() {
     for (auto& Handler : (*this)) {
-        if (Handler) Handler->UpdateEntity();
+        if (Handler) {
+            Handler->UpdateEntity();
+            Handler->Children.Update();
+        }
     }
 }
 void EntityStorage::Clear() {
