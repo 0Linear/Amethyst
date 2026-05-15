@@ -17,8 +17,8 @@ struct iEntHandler {
 
     virtual void SetProperty(const std::string& name, ADFEntry property) = 0;
     virtual std::optional<ADFEntry> GetProperty(const std::string& name) = 0;
-    virtual void PropertiesFromADF(const ADFEntry& Saved) = 0;
-    virtual ADFEntry PropertiesToADF() = 0;
+    virtual void FromADF(const ADFEntry& Saved) = 0;
+    virtual ADFEntry ToADF() = 0;
 
     virtual void InitEntity() = 0;
     virtual void UpdateEntity() = 0;
@@ -28,7 +28,6 @@ struct iEntHandler {
 
     virtual void AddTag(const std::string& tag) = 0;
     virtual bool HasTag(const std::string& tag) = 0;
-    virtual ADFEntry TagsToADF() const = 0;
 
     virtual ~iEntHandler() {};
 
@@ -75,6 +74,17 @@ protected:
         }, Property);
     }
 
+    inline ADFEntry TagsToADF() const {
+        ADFEntry ret = ADFEntry::Array();
+        auto& retarr = ret.GetArray();
+
+        for (const auto& tag : tags) {
+            retarr.emplace_back(ADFEntry::String(tag));
+        }
+
+        return ret;
+    }
+
 public:
     T Entity;
     
@@ -113,17 +123,38 @@ public:
         }
     }
 
-    ADFEntry PropertiesToADF() {
-        Entity.OnSave();
-
+    ADFEntry ToADF() {
         ADFEntry ret = ADFEntry::Map();
         auto& retmap = ret.GetChildren();
 
+        retmap.emplace("classname", ADFEntry::String(classname));
+
+        auto& propertymap = retmap.emplace("properties", ADFEntry::Map()).first->second.GetChildren();
+
         for (auto property : Properties) {
-            retmap.emplace(property.first, PropertyToADF(Properties.at(property.first)));
+            propertymap.emplace(property.first, PropertyToADF(Properties.at(property.first)));
         }
 
+        retmap.emplace("tags", TagsToADF());
+
         return ret;
+    }
+    void FromADF(const ADFEntry& Saved) {
+        const auto& Data = Saved.GetChildren();
+
+        auto& propertymap = Data.at("properties").GetChildren();
+        for (const auto& property : propertymap) {
+            SetProperty(property.first, property.second);
+        }
+
+        auto& tagarray = Data.at("tags").GetArray();
+        for (const auto& tag : tagarray) {
+            AddTag(tag.GetString());
+        }
+
+        world->EntityStorageFromADF(Data.at("children"), &Children, this);
+        
+        InitEntity();
     }
 
 
@@ -136,24 +167,7 @@ public:
 
     inline void AddTag(const std::string& tag) { tags.push_back(tag); }
     inline bool HasTag(const std::string& tag) { return std::find(tags.begin(), tags.end(), tag) != tags.end(); }
-    inline ADFEntry TagsToADF() const {
-        ADFEntry ret = ADFEntry::Array();
-        auto& retarr = ret.GetArray();
 
-        for (const auto& tag : tags) {
-            retarr.emplace_back(ADFEntry::String(tag));
-        }
-
-        return ret;
-    }
-
-
-    void PropertiesFromADF(const ADFEntry& Saved) {
-        const auto& Data = Saved.GetChildren();
-        for (const auto& property : Data) {
-            SetProperty(property.first, property.second);
-        }
-    }
     BaseEntityHandler(const char* Classname, World* World, std::optional<iEntHandler*> Parent) : classname(Classname), parent(Parent) { world = World; }
     ~BaseEntityHandler() = default;
 };

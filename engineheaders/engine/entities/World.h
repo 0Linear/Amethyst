@@ -41,8 +41,6 @@ public:
 class ENGINEEXPORT World : public EntityStorage {
     std::shared_ptr<RWorld> RenderWorld;
     std::string MapName = "";
-    void EntityStorageFromADF(const ADFEntry& Saved, EntityStorage* Storage, std::optional<iEntHandler*> parent = std::nullopt);
-    ADFEntry EntityStorageToADF(EntityStorage* Storage);
 
 public:
     void Restore(const ADFEntry& Saved);
@@ -57,4 +55,7 @@ public:
     World(std::shared_ptr<Renderer> Renderer);
 
     std::shared_ptr<RWorld> GetRWorld() { return RenderWorld; }
+
+    void EntityStorageFromADF(const ADFEntry& Saved, EntityStorage* Storage, std::optional<iEntHandler*> parent = std::nullopt);
+    ADFEntry EntityStorageToADF(EntityStorage* Storage);
 };

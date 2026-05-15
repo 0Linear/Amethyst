@@ -16,13 +16,7 @@ ADFEntry World::EntityStorageToADF(EntityStorage* Storage) {
         auto& Handler = (*Storage)[i];
         if (!Handler) continue;
 
-        auto slotstring = std::to_string(i);
-        auto& Saved = retmap.emplace(slotstring, ADFEntry::Map()).first->second.GetChildren();
-
-        Saved.emplace("classname",  ADFEntry::String(Handler->GetClassname()));
-        Saved.emplace("properties", Handler->PropertiesToADF());
-        Saved.emplace("children",   EntityStorageToADF(&Handler->Children));
-        Saved.emplace("tags",       Handler->TagsToADF());
+        retmap.emplace(std::to_string(i), Handler->ToADF());
     }
 
     return ret;
@@ -40,13 +34,10 @@ void World::EntityStorageFromADF(const ADFEntry& Saved, EntityStorage* Storage, 
             continue;
         }
 
-        Handler->PropertiesFromADF(SavedEntity.second["properties"]);
         int slot = std::stoi(SavedEntity.first);
-        for (const auto& tag : SavedEntity.second["tags"].GetArray()) { Handler->AddTag(tag.GetString()); }
         (*Storage)[slot] = Handler;
         Handler->slot = slot;
-        EntityStorageFromADF(SavedEntity.second["children"], &Handler->Children, Handler.get());
-        Handler->InitEntity();
+        Handler->FromADF(SavedEntity.second);
     }
 }
 
