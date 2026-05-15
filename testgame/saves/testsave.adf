@@ -10,7 +10,20 @@
                 "angles" { x 45 y 180 z 45 }
                 "scale" { x 1 y 3 z 5 }
             }
-            "children" {}
+            "children" {
+                "0" {
+                    "classname" "prop_dynamic"
+                    "properties" {
+                        "targetname" "hia"
+                        "position" { x -128 y 0 z 128 }
+                        "model" "backpack.adf"
+                        "angles" { x 45 y 180 z 45 }
+                        "scale" { x 1 y 3 z 5 }
+                    }
+                    "children" {}
+                    "tags" []
+                }
+            }
             "tags" []
         }
     }

@@ -99,7 +99,7 @@ void STDGLRenderer::Draw() {
             glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
             
             for (auto& iarray : SharedInstanceArraysVec) {
-                iarray->Bind();
+                iarray->Model->BindInfo();
                 glUseProgram(ModelInstanceBlankerShader);
                 glDispatchCompute(1, 1, 1);
             }
@@ -116,7 +116,6 @@ void STDGLRenderer::Draw() {
             glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 
             for (auto& iarray : SharedInstanceArraysVec) {
-                iarray->Bind();
                 iarray->Model->BindInfo();
                 glUseProgram(ModelInstanceReplicatorShader);
                 glDispatchCompute(1, 1, 1);
