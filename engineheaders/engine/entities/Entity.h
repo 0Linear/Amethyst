@@ -127,15 +127,16 @@ public:
         ADFEntry ret = ADFEntry::Map();
         auto& retmap = ret.GetChildren();
 
-        retmap.emplace("classname", ADFEntry::String(classname));
+        retmap.emplace("children", world->EntityStorageToADF(&Children));
+
+        retmap.emplace("tags", TagsToADF());
 
         auto& propertymap = retmap.emplace("properties", ADFEntry::Map()).first->second.GetChildren();
-
         for (auto property : Properties) {
             propertymap.emplace(property.first, PropertyToADF(Properties.at(property.first)));
         }
 
-        retmap.emplace("tags", TagsToADF());
+        retmap.emplace("classname", ADFEntry::String(classname));
 
         return ret;
     }
