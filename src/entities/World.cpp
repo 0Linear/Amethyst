@@ -113,7 +113,7 @@ void Engine::Internal::RegisterEntityCreationLambda(const char* classname, std::
 
 
 void EntityStorage::AddEntityBack(std::shared_ptr<iEntHandler> Entity) {
-    EntityHandlers[Entity->slot] = Entity;
+    (*this)[Entity->slot] = Entity;
 }
 
 int EntityStorage::GetFreeIndex() {
@@ -121,7 +121,7 @@ int EntityStorage::GetFreeIndex() {
     int ret = iterator - begin(); // Yes this works even when not enough space, since end is one after the last element. 
 
     if (iterator == end()) {
-        EntityHandlers.resize(size() + ResizeAdditionalSlotAmount);
+        resize(size() + ResizeAdditionalSlotAmount);
     }
 
     return ret;
