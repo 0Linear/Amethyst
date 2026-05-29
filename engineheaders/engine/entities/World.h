@@ -13,7 +13,6 @@ struct iEntHandler;
 
 class EntityStorage : public std::vector<std::shared_ptr<iEntHandler>> {
     static inline constexpr int ResizeAdditionalSlotAmount = 16;
-
 public:
     void AddEntityBack(std::shared_ptr<iEntHandler> Entity);
 

@@ -15,8 +15,7 @@
 #include <memory>
 #include <queue>
 
-class STDGLModel {
-public:
+struct STDGLModel {
     void Draw() {
         glBindVertexArray(VAO);
         for (int LOD = 0; LOD < LODCount; LOD++) {
@@ -61,8 +60,7 @@ public:
     GLuint VBO, EBO, ModelInfo;
 };
 
-class STDGLModelInstanceArray {
-public:
+struct STDGLModelInstanceArray {
     struct InstanceArrayBuffer {
         std::array<mat4, STDGLMODEL_INSTANCE_MAX_COUNT> InstanceMatrices;
     };
@@ -94,12 +92,9 @@ public:
                     NextIndex * sizeof(mat4));
         
     }
-
-    friend class GLModelInstance;
 };
 
-class STDGLModelInstance : public ModelInstance {
-public:
+struct STDGLModelInstance : public ModelInstance {
     std::shared_ptr<STDGLModelInstanceArray> parent;
     uint16_t index;
 
@@ -112,8 +107,7 @@ public:
 
 
 class STDGLModelSystem {
-public:
     weak_vector<STDGLModel> Models;
-
+public:
     std::shared_ptr<STDGLModel> GetModel(std::string path);
 };
