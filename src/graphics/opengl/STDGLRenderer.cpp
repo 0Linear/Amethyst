@@ -33,6 +33,10 @@ void STDGLRenderer::Init() {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
+#ifndef DEBUG
+    // TODO: Should add a setting to make it override NO_ERROR even in release
+    glfwWindowHint(GLFW_NO_ERROR, GLFW_TRUE);
+#endif
 
     GLFWwindow* data = glfwCreateWindow(1, 1, "The “onosecond” is the second after you make a terrible mistake. The second when you realise what you just did", NULL, NULL);
     glfwMakeContextCurrent(data);

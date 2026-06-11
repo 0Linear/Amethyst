@@ -54,6 +54,11 @@ void STDGLWindow::Update() {
     glfwDefaultWindowHints();
 
 	glfwWindowHint(GLFW_SAMPLES, 16);
+#ifndef DEBUG
+    // TODO: Should add a setting to make it override NO_ERROR even in release
+    glfwWindowHint(GLFW_NO_ERROR, GLFW_TRUE);
+#endif
+
     data = glfwCreateWindow(Width, Height, Name.c_str(), NULL, reinterpret_cast<GLFWwindow*>(rendererData));
     glfwSwapInterval(1); // TODO: add a vsync setting
 
