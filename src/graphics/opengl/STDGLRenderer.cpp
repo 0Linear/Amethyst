@@ -37,14 +37,13 @@ void STDGLRenderer::Init() {
     GLFWwindow* data = glfwCreateWindow(1, 1, "The “onosecond” is the second after you make a terrible mistake. The second when you realise what you just did", NULL, NULL);
     glfwMakeContextCurrent(data);
 
-    glfwSwapInterval(0);
+    glfwSwapInterval(1); // TODO: add a vsync setting
 
     rendererData = data;
 
     ShaderSystem.Init();
 
     ModelInstancePreprocessShader = ShaderSystem.GetComputeShader("STDGLModel_InstancePreprocess");
-    ModelInstanceBlankerShader = ShaderSystem.GetComputeShader("STDGLModel_InstanceBlanker");
     ModelInstanceReplicatorShader = ShaderSystem.GetComputeShader("STDGLModel_InstanceReplicator");
 }
 
@@ -98,13 +97,13 @@ void STDGLRenderer::Draw() {
             glViewport(0, 0, camera->GetResolution().x, camera->GetResolution().y);
             glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
             
-            glUseProgram(ModelInstanceBlankerShader);
             for (auto& iarray : SharedInstanceArraysVec) {
-                iarray->Model->BindInfo();
-                glDispatchCompute(1, 1, 1);
-            }
+                auto* model = iarray->Model.get();
 
-            glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
+                for (int i = 0; i < model->LODCount; i++) {
+                    glClearNamedBufferSubData(model->ModelInfo, GL_R32UI, i * STDGLMODEL_MESH_MAX_COUNT * sizeof(DrawElementsIndirectCommand) + offsetof(DrawElementsIndirectCommand, instanceCount), sizeof(GLuint), GL_RED_INTEGER, GL_UNSIGNED_INT, nullptr);
+                }
+            }
 
             glUseProgram(ModelInstancePreprocessShader);
             for (auto& iarray : SharedInstanceArraysVec) {

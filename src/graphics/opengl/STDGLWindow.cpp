@@ -55,6 +55,7 @@ void STDGLWindow::Update() {
 
 	glfwWindowHint(GLFW_SAMPLES, 16);
     data = glfwCreateWindow(Width, Height, Name.c_str(), NULL, reinterpret_cast<GLFWwindow*>(rendererData));
+    glfwSwapInterval(1); // TODO: add a vsync setting
 
     ProcessCursorEating();
 

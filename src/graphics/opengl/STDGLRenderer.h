@@ -24,7 +24,6 @@ protected:
 
     std::array<GLsync, 2> DoubleBufferFences = { nullptr, nullptr };
 
-    GLuint ModelInstanceBlankerShader;
     GLuint ModelInstancePreprocessShader;
     GLuint ModelInstanceReplicatorShader;
 
