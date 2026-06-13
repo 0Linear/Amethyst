@@ -120,7 +120,7 @@ int main() {
 	tmpworld.Restore(savefile);
 
 	auto newsavefile = tmpworld.Save();
-	newsavefile.ToFile("hi.txt");
+	newsavefile.ToFile("saves/hi.adf");
 
 	auto tmpentityhandler = tmpworld[0];
 
