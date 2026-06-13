@@ -89,11 +89,6 @@ void STDGLRenderer::Draw() {
         auto SharedCameraVec = rworld->CameraVec.lock();
         auto SharedInstanceArraysVec = rworld->InstanceArrays.lock();
 
-        // Flush the writes
-        for (auto& iarray : SharedInstanceArraysVec) {
-            iarray->Flush();
-        }
-
         for (std::shared_ptr<STDGLCamera>& camera : SharedCameraVec) {
 
             GL_PUSH_DEBUG(camera->Name.c_str());
@@ -101,6 +96,8 @@ void STDGLRenderer::Draw() {
             glViewport(0, 0, camera->GetResolution().x, camera->GetResolution().y);
             glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
             
+
+            // Clear the instance counts.
             for (auto& iarray : SharedInstanceArraysVec) {
                 auto* model = iarray->Model.get();
 
@@ -109,6 +106,7 @@ void STDGLRenderer::Draw() {
                 }
             }
 
+            // Cull instances.
             glUseProgram(ModelInstancePreprocessShader);
             for (auto& iarray : SharedInstanceArraysVec) {
                 iarray->Bind();
@@ -118,6 +116,7 @@ void STDGLRenderer::Draw() {
 
             glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 
+            // Replicate the instance counts across all LOD meshes.
             glUseProgram(ModelInstanceReplicatorShader);
             for (auto& iarray : SharedInstanceArraysVec) {
                 iarray->Model->BindInfo();
@@ -126,6 +125,7 @@ void STDGLRenderer::Draw() {
 
             glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT | GL_COMMAND_BARRIER_BIT);
 
+            // Draw.
             glUseProgram(0);
             glBindProgramPipeline(tmpshader);
             for (auto& iarray : SharedInstanceArraysVec) {

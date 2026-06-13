@@ -32,7 +32,7 @@ std::unique_ptr<ModelInstance> STDGLRWorld::MakeModelInstance(const std::string&
         if (array->Model->Path == path) return array->MakeModelInstance();
     }
 
-    auto array = std::make_shared<STDGLModelInstanceArray>(context, modelsystem->GetModel(path), &(renderer->GetFrameCounter()));
+    auto array = std::make_shared<STDGLModelInstanceArray>(context, modelsystem->GetModel(path));
     array->selfRef = array;
     InstanceArrays.push_back(array);
     return array->MakeModelInstance();

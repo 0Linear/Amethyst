@@ -66,32 +66,34 @@ struct STDGLModelInstanceArray {
     };
 
     GLFWwindow* rendererData;
-    GLuint InstanceBuffer = 0;
     std::queue<uint16_t> FreedIndices;
-    uint16_t NextIndex = 0;
     std::shared_ptr<STDGLModel> Model;
     std::weak_ptr<STDGLModelInstanceArray> selfRef;
     InstanceArrayBuffer* InstanceBufferMapped;
-    const uint64_t *FrameCounterPtr;
+    GLuint InstanceBuffer = 0;
+    uint16_t NextIndex = 0;
+    bool wasModified = false;
+    bool ShouldUseOtherBuffer = false;
+    
 
-    STDGLModelInstanceArray(GLFWwindow* data, std::shared_ptr<STDGLModel> model, const uint64_t* framecounterptr);
+    STDGLModelInstanceArray(GLFWwindow* data, std::shared_ptr<STDGLModel> model);
 
     ~STDGLModelInstanceArray();
         
     std::unique_ptr<ModelInstance> MakeModelInstance();
     inline void Bind() {
+        if (wasModified) {
+            wasModified = false;
+            ShouldUseOtherBuffer = !ShouldUseOtherBuffer;
+            glFlushMappedNamedBufferRange(InstanceBuffer, 
+                sizeof(InstanceArrayBuffer) * ShouldUseOtherBuffer,
+                NextIndex * sizeof(mat4));
+        }
         glBindBufferRange(GL_SHADER_STORAGE_BUFFER, 1, InstanceBuffer,
-                        sizeof(InstanceArrayBuffer) * (*FrameCounterPtr & 1),
+                        sizeof(InstanceArrayBuffer) * ShouldUseOtherBuffer,
                         sizeof(InstanceArrayBuffer));
     }
 
-    inline void Flush() {
-        bool isFrameOdd = *FrameCounterPtr & 1;
-            glFlushMappedNamedBufferRange(InstanceBuffer, 
-                    sizeof(InstanceArrayBuffer) * isFrameOdd,
-                    NextIndex * sizeof(mat4));
-        
-    }
 };
 
 struct STDGLModelInstance : public ModelInstance {
