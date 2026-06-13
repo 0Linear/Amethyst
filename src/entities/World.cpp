@@ -10,7 +10,7 @@ static std::map<std::string, std::function<std::shared_ptr<iEntHandler>(World*, 
 
 ADFEntry World::EntityStorageToADF(EntityStorage* Storage) {
     ADFEntry ret = ADFEntry::Map();
-    auto& retmap = ret.GetChildren();
+    auto& retmap = ret.GetMap();
 
     for (int i = 0; i < Storage->size(); i++) {
         auto& Handler = (*Storage)[i];
@@ -22,8 +22,8 @@ ADFEntry World::EntityStorageToADF(EntityStorage* Storage) {
     return ret;
 }
 void World::EntityStorageFromADF(const ADFEntry& Saved, EntityStorage* Storage, std::optional<iEntHandler*> parent) {
-    const auto& entmap = Saved.GetChildren();
-    Storage->resize(Saved.GetChildren().size());
+    const auto& entmap = Saved.GetMap();
+    Storage->resize(Saved.GetMap().size());
 
     for (const auto& SavedEntity : entmap) {
         std::shared_ptr<iEntHandler> Handler;
@@ -44,8 +44,8 @@ void World::EntityStorageFromADF(const ADFEntry& Saved, EntityStorage* Storage, 
 
 ADFEntry World::Save() {
     ADFEntry ret = ADFEntry::Map();
-    ret.GetChildren().emplace("Savefile", ADFEntry::Map());
-    auto& savemap = ret["Savefile"].GetChildren();
+    ret.GetMap().emplace("Savefile", ADFEntry::Map());
+    auto& savemap = ret["Savefile"].GetMap();
 
     savemap.emplace("MapName", ADFEntry::String(MapName));
     savemap.emplace("Entities", EntityStorageToADF(this));

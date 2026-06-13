@@ -125,13 +125,13 @@ public:
 
     ADFEntry ToADF() {
         ADFEntry ret = ADFEntry::Map();
-        auto& retmap = ret.GetChildren();
+        auto& retmap = ret.GetMap();
 
         retmap.emplace("children", world->EntityStorageToADF(&Children));
 
         retmap.emplace("tags", TagsToADF());
 
-        auto& propertymap = retmap.emplace("properties", ADFEntry::Map()).first->second.GetChildren();
+        auto& propertymap = retmap.emplace("properties", ADFEntry::Map()).first->second.GetMap();
         for (auto property : Properties) {
             propertymap.emplace(property.first, PropertyToADF(Properties.at(property.first)));
         }
@@ -141,9 +141,9 @@ public:
         return ret;
     }
     void FromADF(const ADFEntry& Saved) {
-        const auto& Data = Saved.GetChildren();
+        const auto& Data = Saved.GetMap();
 
-        auto& propertymap = Data.at("properties").GetChildren();
+        auto& propertymap = Data.at("properties").GetMap();
         for (const auto& property : propertymap) {
             SetProperty(property.first, property.second);
         }

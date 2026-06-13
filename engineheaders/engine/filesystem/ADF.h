@@ -7,6 +7,9 @@
 #include <string>
 #include <vector>
 #include <memory>
+#include <sstream>
+
+
 /*!
 *  \brief Runtime version of an entry from an Amethyst Data Format(.adf) file.
 *
@@ -55,12 +58,14 @@ class ADFEntry {
         const std::string& filepath;
     public:
         inline Tokenizer(const std::string& FilePath) : filepath(FilePath) {
-            filestream = Filesystem::GetFile(FilePath, std::ios::in | std::ios_base::binary);
+            filestream = Filesystem::GetFileAsStream(FilePath, std::ios::in | std::ios_base::binary);
         }
         Token ReadToken();
     };
 
     [[noreturn]] void ADFError(const std::string& error) const;
+    ENGINEEXPORT void ToFile(std::ofstream& stream, int IndentationLevel) const;
+    void ToFileObjectFormatHelper(std::ofstream& stream, int IndentationLevel) const;
 
     ADFEntry(ADFType Type, Tokenizer& Tokenizer, std::shared_ptr<std::string> filename);
     ADFEntry(std::string content, std::shared_ptr<std::string> filename) { data = std::move(content); filename = filename; }
@@ -68,6 +73,13 @@ class ADFEntry {
 public:
     //! Creates an ADF tree from a .adf file.
     static ENGINEEXPORT ADFEntry FromFile(const std::string& FilePath);
+    inline void ToFile(const std::string& FilePath) const {
+        if (!IsMap()) {
+            Engine::Error("Attempted to turn a non-Map-type ADF entry into a string, only a Map-type entry can be the root node of a tree!");
+        }
+        auto out = Filesystem::GetFileOutputStream(FilePath, std::ios::binary);
+        ToFile(out, 0);
+    }
 
     //! Used for manual creation of string-type entries.
     inline static ADFEntry String(std::string Content = std::string()) { ADFEntry ret; ret.data = Content; return ret; }
@@ -87,13 +99,13 @@ public:
     }
     inline std::string& GetString() {
         if (!IsString()) {
-            ADFError("Tried to get a string value from a different type of an ADF entry!");
+            ADFError("Tried to get a string from a different type of an ADF entry!");
         }
         return std::get<std::string>(data);
     }
-    inline std::map<std::string, ADFEntry>& GetChildren() {
+    inline std::map<std::string, ADFEntry>& GetMap() {
         if (!IsMap()) {
-            ADFError("Tried to get a list of children from a different type of an ADF entry!");
+            ADFError("Tried to get a map from a different type of an ADF entry!");
         }
         return std::get<std::map<std::string, ADFEntry>>(data);
     }
@@ -110,7 +122,7 @@ public:
         }
         return std::get<std::string>(data);
     }
-    inline const std::map<std::string, ADFEntry>& GetChildren() const {
+    inline const std::map<std::string, ADFEntry>& GetMap() const {
         if (!IsMap()) {
             ADFError("Tried to get a list of children from a different type of an ADF entry!");
         }
@@ -130,7 +142,7 @@ public:
     }
 
     inline ADFEntry& operator[](const std::string& name) {
-        return GetChildren().at(name);
+        return GetMap().at(name);
     }
 
     inline const ADFEntry& operator[](int i) const {
@@ -138,15 +150,15 @@ public:
     }
 
     inline const ADFEntry& operator[](const std::string& name) const {
-        return GetChildren().at(name);
+        return GetMap().at(name);
     }
 
     inline bool HasChild(const std::string& name) const {
-        return GetChildren().contains(name);
+        return GetMap().contains(name);
     }
 
     inline bool HasChildren() const {
-        return !GetChildren().empty();
+        return !GetMap().empty();
     }
 
     inline bool HasElements() const {
@@ -157,7 +169,7 @@ public:
     //! Used for manual creation of map-type entries that represent a \ref vec2.
     inline static ADFEntry Vector2(const vec2 value) {
         ADFEntry ret = Map();
-        auto& retmap = ret.GetChildren();
+        auto& retmap = ret.GetMap();
 
         retmap.emplace("x", String(std::to_string(value.x)));
         retmap.emplace("y", String(std::to_string(value.y)));
@@ -167,7 +179,7 @@ public:
     //! Used for manual creation of map-type entries that represent a \ref vec3.
     inline static ADFEntry Vector3(const vec3 value) {
         ADFEntry ret = Map();
-        auto& retmap = ret.GetChildren();
+        auto& retmap = ret.GetMap();
 
         retmap.emplace("x", String(std::to_string(value.x)));
         retmap.emplace("y", String(std::to_string(value.y)));
@@ -178,7 +190,7 @@ public:
     //! Used for manual creation of map-type entries that represent a \ref vec4.
     inline static ADFEntry Vector4(const vec4 value) {
         ADFEntry ret = Map();
-        auto& retmap = ret.GetChildren();
+        auto& retmap = ret.GetMap();
 
         retmap.emplace("x", String(std::to_string(value.x)));
         retmap.emplace("y", String(std::to_string(value.y)));
@@ -190,7 +202,7 @@ public:
     //! Used for manual creation of map-type entries that represent a \ref quat.
     inline static ADFEntry Quaternion(const quat value) {
         ADFEntry ret = Map();
-        auto& retmap = ret.GetChildren();
+        auto& retmap = ret.GetMap();
 
         retmap.emplace("x", String(std::to_string(value.x)));
         retmap.emplace("y", String(std::to_string(value.y)));
@@ -201,7 +213,7 @@ public:
     } 
 
     inline vec2 GetVec2() const {
-        const auto& map = GetChildren();
+        const auto& map = GetMap();
 
         if (map.contains("x") && map.contains("y")) {
             return vec2(std::stof(map.at("x").GetString()), std::stof(map.at("y").GetString()));
@@ -210,7 +222,7 @@ public:
         ADFError("Tried to get a vec2 from a different type of an ADF entry!");
     }
     inline vec3 GetVec3() const {
-        const auto& map = GetChildren();
+        const auto& map = GetMap();
 
         if (map.contains("x") && map.contains("y") && map.contains("z")) {
             return vec3(std::stof(map.at("x").GetString()), std::stof(map.at("y").GetString()), std::stof(map.at("z").GetString()));
@@ -219,7 +231,7 @@ public:
         ADFError("Tried to get a vec3 from a different type of an ADF entry!");
     }
     inline vec4 GetVec4() const {
-        const auto& map = GetChildren();
+        const auto& map = GetMap();
 
         if (map.contains("x") && map.contains("y") && map.contains("z") && map.contains("2")) {
             return vec4(std::stof(map.at("x").GetString()), std::stof(map.at("y").GetString()), std::stof(map.at("z").GetString()), std::stof(map.at("w").GetString()));
@@ -228,7 +240,7 @@ public:
         ADFError("Tried to get a vec4 from a different type of an ADF entry!");
     }
     inline quat GetQuat() const {
-        const auto& map = GetChildren();
+        const auto& map = GetMap();
 
         if (map.contains("x") && map.contains("y") && map.contains("z") && map.contains("w")) {
             return quat(std::stof(map.at("x").GetString()), std::stof(map.at("y").GetString()), std::stof(map.at("z").GetString()), std::stof(map.at("w").GetString()));

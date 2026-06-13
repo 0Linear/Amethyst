@@ -1,4 +1,4 @@
-//movercell: File has been modified to use Amethyst's Filesystem::GetFile and Engine::Warning
+//movercell: File has been modified to use Amethyst's Filesystem::GetFileAsStream and Engine::Warning
 
 #pragma once
 
@@ -76,7 +76,7 @@ public:
 		static bool isRecursiveCall = false;
 
 		std::string fullSourceCode = "";
-		std::ifstream file = Filesystem::GetFile(path, std::ios::in);
+		std::ifstream file = Filesystem::GetFileAsStream(path, std::ios::in);
 
 		if (!file.is_open())
 		{

@@ -3,7 +3,7 @@
 #include "engine/master.h"
 
 void STDGLShaderSystem::InitCompute(const ADFEntry& ShaderDefs) {
-    const auto& ShaderDefMap = ShaderDefs["Compute"].GetChildren();
+    const auto& ShaderDefMap = ShaderDefs["Compute"].GetMap();
     if (ShaderDefMap.empty()) return;
 
     for (const auto& shader : ShaderDefMap) {
@@ -51,7 +51,7 @@ void STDGLShaderSystem::InitCompute(const ADFEntry& ShaderDefs) {
 
 void STDGLShaderSystem::InitGraphic(const ADFEntry& ShaderDefs) {
     // Vertex shaders.
-    const auto& VertexShaderDefMap = ShaderDefs["Vertex"].GetChildren();
+    const auto& VertexShaderDefMap = ShaderDefs["Vertex"].GetMap();
     VertexShaders.reserve(VertexShaderDefMap.size());
 
     for (const auto& shader : VertexShaderDefMap) {
@@ -83,7 +83,7 @@ void STDGLShaderSystem::InitGraphic(const ADFEntry& ShaderDefs) {
 
 
     // Fragment + Depth shaders.
-    const auto& FragmentShaderDefMap = ShaderDefs["Fragment"].GetChildren();
+    const auto& FragmentShaderDefMap = ShaderDefs["Fragment"].GetMap();
     FragmentShaders.reserve(FragmentShaderDefMap.size());
 
     for (const auto& shader : FragmentShaderDefMap) {

@@ -138,6 +138,8 @@ ADFEntry::ADFEntry(ADFType Type, Tokenizer& Tokenizer, std::shared_ptr<std::stri
     }
 }
 
+
+
 void ADFEntry::ADFError(const std::string& error) const {
     std::ostringstream output;
     output << error;
@@ -154,4 +156,61 @@ ENGINEEXPORT ADFEntry ADFEntry::FromFile(const std::string& FilePath) {
     Tokenizer Tokenizer(FilePath);
     auto filename = std::make_shared<std::string>(FilePath);
     return ADFEntry(ADFType::map, Tokenizer, filename);
+}
+
+void ADFEntry::ToFileObjectFormatHelper(std::ofstream& stream, int IndentationLevel) const {
+    if (IsString()) {
+        stream << '\"' << std::get<std::string>(data) << '\"';
+    } else if (IsMap()) {
+        stream << '{';
+        if (HasChildren()) {
+            stream << '\n';
+            ToFile(stream, IndentationLevel + 1);
+
+            for (int i = 0; i < IndentationLevel; i++) {
+                stream << '\t';
+            }
+        }
+
+        stream << '}';
+    } else {
+        stream << '[';
+        if (HasElements()) {
+            stream << '\n';
+            ToFile(stream, IndentationLevel + 1);
+
+            for (int i = 0; i < IndentationLevel; i++) {
+                stream << '\t';
+            }
+        }
+
+        stream << ']';
+    }
+}
+
+ENGINEEXPORT void ADFEntry::ToFile(std::ofstream& stream, int IndentationLevel) const {
+    if (IsArray()) {
+        const auto& array = GetArray();
+
+        for (const auto& element : array) {
+            for (int i = 0; i < IndentationLevel; i++) {
+                stream << '\t';
+            }
+
+            element.ToFileObjectFormatHelper(stream, IndentationLevel);
+            stream << '\n';
+        }
+    } else {
+        const auto& map = GetMap();
+
+        for (const auto& kvpair : map) {
+            for (int i = 0; i < IndentationLevel; i++) {
+                stream << '\t';
+            }
+
+            stream << '\"' << kvpair.first << "\" ";
+            kvpair.second.ToFileObjectFormatHelper(stream, IndentationLevel);
+            stream << '\n';
+        }
+    }
 }
